@@ -6,9 +6,7 @@
  * @return string
  */
 function base_path(string $path = ''): string {
-    if (!$path) {
-        return __DIR__;
-    }
+    if (!$path) return __DIR__;
 
     $sep = DIRECTORY_SEPARATOR;
 
