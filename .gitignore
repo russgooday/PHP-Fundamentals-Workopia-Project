@@ -1,3 +1,4 @@
+/resources
 /vendor
 /node_modules
 /config/db.php
