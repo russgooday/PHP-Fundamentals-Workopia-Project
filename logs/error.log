@@ -1,0 +1,13 @@
+[2026-08-21 18:57:59] [uri: /] Partial file 'header' not found at: C:\laragon\www\workopia\views\partials\header.php
+[2026-08-21 19:08:56] [uri: /] Partial file 'header' not found at: C:\laragon\www\workopia\views\partials\header.php
+[2026-08-21 19:09:02] [uri: /anything] Partial file 'header' not found at: C:\laragon\www\workopia\views\partials\header.php
+[2026-08-21 19:09:21] [uri: /home] Partial file 'header' not found at: C:\laragon\www\workopia\views\partials\header.php
+[2026-08-21 19:13:44] [uri: /home] Partial file 'header' not found at: C:\laragon\www\workopia\views\partials\header.php
+[2026-08-21 19:14:09] [uri: /home] Partial file 'header' not found at: C:\laragon\www\workopia\views\partials\header.php
+[2026-08-21 20:54:59] [uri: /listings] View file 'head' not found at: C:\laragon\www\workopia\views\head.view.php
+[2026-08-21 20:55:07] [uri: /listings] View file 'head' not found at: C:\laragon\www\workopia\views\head.view.php
+[2026-08-21 20:56:02] [uri: /listings] View file 'head' not found at: C:\laragon\www\workopia\views\head.view.php
+[2026-08-21 20:56:03] [uri: /listings] View file 'head' not found at: C:\laragon\www\workopia\views\head.view.php
+[2026-08-21 20:56:04] [uri: /listings] View file 'head' not found at: C:\laragon\www\workopia\views\head.view.php
+[2026-08-21 20:56:23] [uri: /listings] View file 'head' not found at: C:\laragon\www\workopia\views\head.view.php
+[2026-08-21 21:25:45] [uri: /somewhere] 404 Not Found: /somewhere
