@@ -1,2 +1,2 @@
 <?php
-loadView('error', [ 'error_type' => 404 ]);
+loadView('error/404', [ 'error_type' => 404 ]);

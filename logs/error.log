@@ -11,3 +11,19 @@
 [2026-08-21 20:56:04] [uri: /listings] View file 'head' not found at: C:\laragon\www\workopia\views\head.view.php
 [2026-08-21 20:56:23] [uri: /listings] View file 'head' not found at: C:\laragon\www\workopia\views\head.view.php
 [2026-08-21 21:25:45] [uri: /somewhere] 404 Not Found: /somewhere
+[2026-08-21 21:32:27] [uri: /listings.html] 404 Not Found: /listings.html
+[2026-08-21 21:33:31] [uri: /.well-known/appspecific/com.chrome.devtools.json] 404 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+[2026-08-21 21:33:51] [uri: /index.html] 404 Not Found: /index.html
+[2026-08-21 21:34:45] [uri: /index.html] 404 Not Found: /index.html
+[2026-08-21 21:35:02] [uri: /login] 404 Not Found: /login
+[2026-08-21 21:36:23] [uri: /post-job] 404 Not Found: /post-job
+[2026-08-21 21:36:34] [uri: /favicon.svg] 404 Not Found: /favicon.svg
+[2026-08-21 21:43:55] [uri: /listings/css/style.css] 404 Not Found: /listings/css/style.css
+[2026-08-21 21:44:12] [uri: /listings/css/style.css] 404 Not Found: /listings/css/style.css
+[2026-08-21 21:44:44] [uri: /favicon.svg] 404 Not Found: /favicon.svg
+[2026-08-21 21:45:39] [uri: /favicon.svg] 404 Not Found: /favicon.svg
+[2026-08-21 21:45:41] [uri: /favicon.svg] 404 Not Found: /favicon.svg
+[2026-08-21 21:46:28] [uri: /hello] 404 Not Found: /hello
+[2026-08-21 21:48:38] [uri: /hello] 404 Not Found: /hello
+[2026-08-21 21:48:42] [uri: /listings] View file 'listings/index' not found at: C:\laragon\www\workopia\views\listings\index.view.php
+[2026-08-21 21:48:42] [uri: /favicon.svg] 404 Not Found: /favicon.svg
