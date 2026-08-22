@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<? loadPartial('head', ['page' => ['title' => 'Listings']]); ?>
-
+<? loadPartial('head', ['page' => ['title' => 'Listings']]) ?>
 <body class="bg-gray-100">
     <? loadPartials(['navbar', 'top-banner']); ?>
 

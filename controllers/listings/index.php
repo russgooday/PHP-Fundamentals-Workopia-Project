@@ -1,2 +1,2 @@
 <?php
-loadView('listings/index');
+loadView('listings/index', ['query_params' => $query_params ?? []]);
