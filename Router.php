@@ -7,6 +7,14 @@ class Router {
         'DELETE' => []
     ];
 
+    protected $errorCodes = [
+        400 => 'Bad Request',
+        401 => 'Unauthorized',
+        403 => 'Forbidden',
+        404 => 'Not Found',
+        500 => 'Internal Server Error'
+    ];
+
     public function registerRoute(string $method, string $uri, string $controller) {
         $this->routes[$method][] = [
             'uri' => $uri,
@@ -62,6 +70,23 @@ class Router {
         return $this;
     }
 
+    /**
+     * Load error page
+     *
+     * @param string $method
+     * @param string $uri
+     * @param int $httpCode
+     * @return void
+     */
+    public function error($method, $uri, $httpCode = 404) {
+        $errorMessage = $this->errorCodes[$httpCode] ?? 'Unknown Error';
+
+        http_response_code($httpCode);
+        logError("{$httpCode} {$errorMessage}: For {$method} {$uri}");
+        loadView("error/{$httpCode}", [ 'error_code' => $httpCode ]);
+        exit;
+    }
+
     public function route(string $uri, string $method, array $params = []) {
         $method = strtoupper($method);
         $path = parse_url($uri, PHP_URL_PATH);
@@ -79,10 +104,7 @@ class Router {
             }
         }
 
-        http_response_code(404);
-        logError("404 Not Found: No route found for {$method} {$uri}");
-        loadView('error/404', [ 'error_type' => 404 ]);
-        exit;
+        $this->error($method, $uri, 404);
     }
 
 }

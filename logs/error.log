@@ -1,1 +1,3 @@
 [2026-08-22 01:33:13] [uri: /nonsense] 404 Not Found: No route found for GET /nonsense
+[2026-08-22 01:43:18] [uri: /nonsense] Error 404: For GET /nonsense
+[2026-08-22 01:50:09] [uri: /nonsense] 404 Not Found: For GET /nonsense
