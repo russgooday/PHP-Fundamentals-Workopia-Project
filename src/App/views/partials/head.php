@@ -9,5 +9,5 @@
     <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
     <link rel="alternate icon" href="/images/favicon.ico" />
     <link rel="stylesheet" href="/css/style.css" />
-    <title>Workopia | <?= htmlspecialchars($page['title'] ?? '') ?></title>
+    <title><?= e($title ?? '') ?></title>
 </head>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<? loadPartial('head', ['page' => ['title' => 'Post a job']]); ?>
+<?= loadPartial('head', ['page' => ['title' => 'Post a job']]); ?>
 
 <body class="bg-gray-100">
-    <? loadPartial('navbar'); ?>
+    <?= loadPartial('navbar'); ?>
 
     <!-- Post a Job Form Box -->
     <section class="flex justify-center items-center mt-20">
@@ -109,7 +109,7 @@
         </div>
     </section>
 
-    <? loadPartial('bottom-banner'); ?>
+    <?= loadPartial('bottom-banner'); ?>
 
 </body>
 

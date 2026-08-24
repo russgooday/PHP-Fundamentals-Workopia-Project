@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<? loadPartial('head', ['page' => ['title' => 'Home']]); ?>
-
+<?= loadPartial('head', ['page' => ['title' => 'Listings']]) ?>
 <body class="bg-gray-100">
-    <? loadPartials(['navbar', 'showcase-search', 'top-banner']);?>
+    <?= loadPartials(['navbar', 'top-banner']); ?>
 
     <!-- Job Listings -->
     <section>
         <div class="container mx-auto p-4 mt-4">
-            <div class="text-center text-3xl mb-4 font-bold border border-gray-300 p-3">Recent Jobs</div>
+            <div class="text-center text-3xl mb-4 font-bold border border-gray-300 p-3">All Jobs</div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <!-- Job Listing 1: Software Engineer -->
                 <div class="rounded-lg shadow-md bg-white">
@@ -22,7 +21,8 @@
                             <li class="mb-2"><strong>Salary:</strong> $80,000</li>
                             <li class="mb-2">
                                 <strong>Location:</strong> New York
-                                <span class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Local</span>
+                                <span
+                                    class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Local</span>
                             </li>
                             <li class="mb-2">
                                 <strong>Tags:</strong> <span>Development</span>,
@@ -48,7 +48,8 @@
                             <li class="mb-2"><strong>Salary:</strong> $70,000</li>
                             <li class="mb-2">
                                 <strong>Location:</strong> San Francisco
-                                <span class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Remote</span>
+                                <span
+                                    class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Remote</span>
                             </li>
                             <li class="mb-2">
                                 <strong>Tags:</strong> <span>Marketing</span>,
@@ -74,7 +75,8 @@
                             <li class="mb-2"><strong>Salary:</strong> $75,000</li>
                             <li class="mb-2">
                                 <strong>Location:</strong> Los Angeles
-                                <span class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Local</span>
+                                <span
+                                    class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Local</span>
                             </li>
                             <li class="mb-2">
                                 <strong>Tags:</strong> <span>Web Development</span>,
@@ -100,7 +102,8 @@
                             <li class="mb-2"><strong>Salary:</strong> $65,000</li>
                             <li class="mb-2">
                                 <strong>Location:</strong> Chicago
-                                <span class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Remote</span>
+                                <span
+                                    class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Remote</span>
                             </li>
                             <li class="mb-2">
                                 <strong>Tags:</strong> <span>Data Analysis</span>,
@@ -126,7 +129,8 @@
                             <li class="mb-2"><strong>Salary:</strong> $60,000</li>
                             <li class="mb-2">
                                 <strong>Location:</strong> Miami
-                                <span class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Local</span>
+                                <span
+                                    class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Local</span>
                             </li>
                             <li class="mb-2">
                                 <strong>Tags:</strong> <span>Graphic Design</span>,
@@ -140,6 +144,7 @@
                     </div>
                 </div>
 
+                <!-- Job Listing 6: Data Scientist -->
                 <div class="rounded-lg shadow-md bg-white">
                     <div class="p-4">
                         <h2 class="text-xl font-semibold">Data Scientist</h2>
@@ -151,7 +156,8 @@
                             <li class="mb-2"><strong>Salary:</strong> $90,000</li>
                             <li class="mb-2">
                                 <strong>Location:</strong> Seattle
-                                <span class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Remote</span>
+                                <span
+                                    class="text-xs bg-blue-500 text-white rounded-full px-2 py-1 ml-2">Remote</span>
                             </li>
                             <li class="mb-2">
                                 <strong>Tags:</strong> <span>Data Science</span>,
@@ -165,13 +171,9 @@
                     </div>
                 </div>
             </div>
-            <a href="/listings" class="block text-xl text-center">
-                <i class="fa fa-arrow-alt-circle-right"></i>
-                Show All Jobs
-            </a>
     </section>
 
-    <? loadPartial('bottom-banner') ?>
+    <?= loadPartial('bottom-banner'); ?>
 
 </body>
 
