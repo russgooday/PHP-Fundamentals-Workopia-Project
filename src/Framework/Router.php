@@ -1,4 +1,7 @@
 <?php
+namespace Framework;
+use PATHS;
+
 class Router {
     protected $routes = [
         'GET' => [],
@@ -74,13 +77,7 @@ class Router {
         $method = strtoupper($method);
 
         foreach($this->routes[$method] as $route) {
-            if (
-                $match =
-                    $this->matchParts(
-                        $this->splitPathToParts($route['uri']),
-                        $this->splitPathToParts($uri)
-                    )
-            ){
+            if ($match = $this->routeMatch($route['uri'], $uri)) {
                 extract($match['params']);
                 include PATHS::CONTROLLERS . $route['controller'];
                 return;
@@ -94,49 +91,90 @@ class Router {
     }
 
     /**
-     * matchParts
-     * Match route URI parts against request path parts and extract dynamic parameters.
+     * Checks whether a URI matches a route template and returns matched parameter values.
      *
-     * Route parts prefixed with ":" are treated as named parameters.
-     * Returns null when the path does not match the route.
+     * The URI path is normalised and matched against a generated regex. If a match is
+     * found, the captured values are mapped back to their parameter names.
      *
-     * @param array<int, string> $route_parts Route definition parts (e.g. ['listings', ':id']).
-     * @param array<int, string> $path_parts Request path parts (e.g. ['listings', '123']).
-     * @return array{path: array<int, string>, params: array<string, string>}|null
+     * @param string $route The route template, e.g. '/items/:id'.
+     * @param string $uri The full URI or path to test.
+     * @return array{params: array<string, string>}|null
+     * The matched parameter values, or null if no match.
+     * Last one wins for duplicate parameter names.
+     *
+     * @example
+     * routeMatch('/listings/:id', 'http://somewhere.com/listings/23') ->
+     * ['params' => ['id' => '23']]
      */
-    private function matchParts(array $route_parts, array $path_parts): ?array {
-        $params = [];
+    private function routeMatch(string $route, string $uri): ?array {
+        extract($this->buildRegexFrom($route));
+        $path = $this->normalisePath(parse_url($uri, PHP_URL_PATH));
 
-        // return early if the number of parts don't match
-        if (count($route_parts) !== count($path_parts))
-            return null;
-
-        foreach ($route_parts as $i => $route_part) {
-            $path_part = $path_parts[$i];
-
-            // if we have a parameter in the route, store the path part value
-            // in the params array with the parameter name as the key
-            if (str_starts_with($route_part, ':'))
-                $params[substr($route_part, 1)] = $path_part;
-
-            elseif ($path_part !== $route_part)
-                return null;
+        if (preg_match($regex, $path, $m)) {
+            // stored parameter names are combined with their respective captured values.
+            return ['params' => array_combine($param_names, array_slice($m, 1))];
         }
-
-        return ['path' => $path_parts, 'params' => $params];
+        return null;
     }
 
     /**
-     * Split a URI's path into parts,
+     * Builds a regex and parameter-name list for matching a route template.
      *
-     * @param string $uri
+     * Route parameters are written as ':name' and are converted into a capture group
+     * that matches a non-empty segment. Literal route parts are escaped before being
+     * combined into the final expression.
+     *
+     * @param string $route The route template, e.g. '/listings/:id/edit'.
+     * @param string $delim The regex delimiter to wrap the pattern in.
+     * @return array{regex: string, param_names: array<int, string>}
+     * The regex and the ordered parameter names.
+     */
+    private function buildRegexFrom(string $route, string $delim = '#'): array {
+        $param_names = [];
+        $reg_parts = [];
+
+        foreach ($this->splitPathToParts($route) as $reg_part) {
+            if (str_starts_with($reg_part, ':')) {
+                // due to the risk of duplicate parameter names,
+                // we cannot use named capture groups.
+                // Instead, we will store and return them.
+                $param_names[] = substr($reg_part, 1);
+                $reg_parts[] = "([^\/]+)";
+            } else {
+                $reg_parts[] = preg_quote($reg_part, $delim);
+            }
+        }
+
+        return [
+            'regex' => $delim . "^\/" . implode('\/', $reg_parts). "$" . $delim,
+            'param_names' => $param_names
+        ];
+    }
+
+    /**
+     * Split a path into parts,
+     *
+     * @param string $path The path to split, e.g. '/listings/123/edit'.
      * @return array
      *
      * @example
-     * http://somewhere.com/folder/subfolder/page -> ['folder', 'subfolder', 'page']
+     * /folder/subfolder/page -> ['folder', 'subfolder', 'page']
      */
-    private function splitPathToParts(string $uri): array {
-        return explode('/', ltrim(parse_url($uri, PHP_URL_PATH), '/'));
+    private function splitPathToParts(string $path): array {
+        return explode('/', trim($path, '/'));
+    }
+
+    /**
+     * Normalises a path by ensuring it starts with a single leading slash.
+     *
+     * @param string $path The path to normalise.
+     * @return string A path that always begins with '/'.
+     *
+     * @example
+     * /folder/subfolder/page/ -> /folder/subfolder/page
+     */
+    private function normalisePath(string $path): string {
+        return '/' . trim($path, '/');
     }
 
 }

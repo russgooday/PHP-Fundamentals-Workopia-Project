@@ -1,4 +1,10 @@
 <?php
+namespace Framework;
+
+use PDO;
+use PDOStatement;
+use PDOException;
+
 require_once __DIR__ . '/../App/helpers/path.php';
 
 require_once basePath('src/App/helpers/debug.php');

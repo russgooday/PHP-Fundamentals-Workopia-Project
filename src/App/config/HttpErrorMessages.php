@@ -1,4 +1,5 @@
 <?php
+namespace App\Config;
 
 class HttpErrorMessages {
 
@@ -25,15 +26,16 @@ class HttpErrorMessages {
      * Fetch error
      *
      * @param int $status_code
-     * @return array
+     * @return array<string,string|int>
+     * Returns an array with keys 'status_code', 'title', and 'message'.
      */
     public function fetchError(int $status_code = 500): array {
+        $messages = $this->messages;
 
-        if (!array_key_exists($status_code, $this->messages)) $status_code = 500;
+        // default to 500 if the status code is not defined in the messages array
+        if (!array_key_exists($status_code, $messages))
+            $status_code = 500;
 
-        return array_merge(
-            ['status_code' => $status_code],
-            $this->messages[$status_code]
-        );
+        return array_merge(['status_code' => $status_code], $messages[$status_code]);
     }
 }

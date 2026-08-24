@@ -1,6 +1,6 @@
 <?php
-include_once basePath('src/App/config/HttpErrorMessages.php');
-$messages = new HttpErrorMessages();
+
+$messages = new APP\Config\HttpErrorMessages();
 
 if ($output = loadView(
     'error', $messages->fetchError($status_code ?? 500)

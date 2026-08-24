@@ -146,3 +146,6 @@
 [2026-08-23 23:41:59] [uri: /] Database connection failed: SQLSTATE[HY000] [1045] Access denied for user ''@'localhost' (using password: NO)
 [2026-08-23 23:43:11] [uri: /] Error: Undefined variable $host in C:\laragon\www\workopia\src\Framework\Database.php on line 17
 [2026-08-23 23:48:56] [uri: /] Database connection failed: SQLSTATE[HY000] [1045] Access denied for user 'russell1'@'localhost' (using password: YES)
+[2026-08-24 06:10:14] [uri: /listings] Error: Undefined variable $registerRoutes in C:\laragon\www\workopia\public\index.php on line 35
+[2026-08-24 06:37:22] [uri: /listings] Error: Undefined variable $router in C:\laragon\www\workopia\public\index.php on line 35
+[2026-08-24 06:38:26] [uri: /listings] Error: Undefined variable $router in C:\laragon\www\workopia\public\index.php on line 35
