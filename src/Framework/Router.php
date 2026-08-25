@@ -70,6 +70,13 @@ class Router
         return $this;
     }
 
+    /**
+     * Dispatch the request to the matching route's controller.
+     * @param string $uri The request URI to match against registered routes.
+     * @param string $method The HTTP method (e.g. 'GET', 'POST').
+     * @param array $params Optional additional parameters.
+     * @return void
+     */
     public function route(string $uri, string $method, array $params = []): void {
         $method = strtoupper($method);
 
