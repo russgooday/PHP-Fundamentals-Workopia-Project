@@ -1,6 +1,6 @@
 <?php
 namespace Framework;
-use Paths;
+use App\Config\Paths;
 
 class Template {
 
