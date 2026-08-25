@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<?= loadPartial('head', ['page' => ['title' => 'Post a job']]); ?>
+<?= $this->renderPartial('head', ['page' => ['title' => 'Post a job']]); ?>
 
 <body class="bg-gray-100">
-    <?= loadPartial('navbar'); ?>
+    <?= $this->renderPartial('navbar'); ?>
 
     <!-- Post a Job Form Box -->
     <section class="flex justify-center items-center mt-20">
@@ -109,7 +109,7 @@
         </div>
     </section>
 
-    <?= loadPartial('bottom-banner'); ?>
+    <?= $this->renderPartial('bottom-banner'); ?>
 
 </body>
 

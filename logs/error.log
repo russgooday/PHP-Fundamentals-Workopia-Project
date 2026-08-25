@@ -149,3 +149,19 @@
 [2026-08-24 06:10:14] [uri: /listings] Error: Undefined variable $registerRoutes in C:\laragon\www\workopia\public\index.php on line 35
 [2026-08-24 06:37:22] [uri: /listings] Error: Undefined variable $router in C:\laragon\www\workopia\public\index.php on line 35
 [2026-08-24 06:38:26] [uri: /listings] Error: Undefined variable $router in C:\laragon\www\workopia\public\index.php on line 35
+[2026-08-25 07:30:56] [uri: /] View file 'partials/head' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/head.view.php
+[2026-08-25 07:30:56] [uri: /] View file 'partials/navbar' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/navbar.view.php
+[2026-08-25 07:30:57] [uri: /] View file 'partials/showcase-search' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/showcase-search.view.php
+[2026-08-25 07:30:57] [uri: /] View file 'partials/top-banner' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/top-banner.view.php
+[2026-08-25 07:30:57] [uri: /] View file 'partials/bottom-banner' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/bottom-banner.view.php
+[2026-08-25 07:32:35] [uri: /] Error: Undefined variable $template in C:\laragon\www\workopia\src\App\views\home.view.php on line 3
+[2026-08-25 07:33:04] [uri: /] View file 'partials/head' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/head.view.php
+[2026-08-25 07:33:04] [uri: /] View file 'partials/navbar' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/navbar.view.php
+[2026-08-25 07:33:04] [uri: /] View file 'partials/showcase-search' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/showcase-search.view.php
+[2026-08-25 07:33:04] [uri: /] View file 'partials/top-banner' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/top-banner.view.php
+[2026-08-25 07:33:04] [uri: /] View file 'partials/bottom-banner' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/bottom-banner.view.php
+[2026-08-25 07:33:28] [uri: /] View file 'partials/head' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/head.view.php
+[2026-08-25 07:33:28] [uri: /] View file 'partials/navbar' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/navbar.view.php
+[2026-08-25 07:33:28] [uri: /] View file 'partials/showcase-search' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/showcase-search.view.php
+[2026-08-25 07:33:28] [uri: /] View file 'partials/top-banner' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/top-banner.view.php
+[2026-08-25 07:33:28] [uri: /] View file 'partials/bottom-banner' not found at: C:\laragon\www\workopia\src\App\Config/../views/partials/bottom-banner.view.php

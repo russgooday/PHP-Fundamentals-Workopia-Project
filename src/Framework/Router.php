@@ -1,10 +1,9 @@
 <?php
 
 namespace Framework;
-use PATHS;
+use Paths;
 
-class Router
-{
+class Router {
     protected $routes = [
         'GET' => [],
         'POST' => [],
@@ -84,13 +83,13 @@ class Router
 
             if ($matched = $this->routeMatch($route['uri'], $uri)) {
                 extract($matched['params']);
-                include PATHS::CONTROLLERS . $route['controller'];
+                include Paths::CONTROLLERS . $route['controller'];
                 return;
             }
         }
 
         $status_code = 404;
-        include PATHS::CONTROLLERS . '/error.php';
+        include Paths::CONTROLLERS . '/error.php';
 
         exit;
     }
@@ -104,7 +103,7 @@ class Router
      * @example routeMatch('/listings/:id', '.../listings/23') -> ['params'=>['id'=>'23']]
      */
     private function routeMatch(string $route, string $uri): ?array {
-        extract($this->buildRegexFrom($route));
+        extract($this->buildRegexFrom($route)); // $regex, $param_names
         $path = $this->normalisePath(parse_url($uri, PHP_URL_PATH));
 
         if (preg_match($regex, $path, $m))

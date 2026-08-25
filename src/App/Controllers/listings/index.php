@@ -1,11 +1,13 @@
 <?php
 
-if ($output = loadView(
-    'listings/index',
-    [
-        'title' => 'Listings'
-    ]
-))
+use Framework\Template;
+
+$template = new Template();
+
+if ($output = $template->render(
+    'listings/index', ['title' => 'Listings']
+)) {
     echo $output;
-else
+} else {
     echo "Error loading listings view.";
+}

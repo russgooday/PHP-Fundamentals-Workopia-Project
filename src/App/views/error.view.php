@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<?= loadPartial('head', ['title' => "{$status_code} {$title}"]); ?>
+<?= $this->renderPartial('head', ['title' => "{$status_code} {$title}"]); ?>
 
 <body class="bg-gray-100">
-    <?= loadPartials(['navbar', 'top-banner']); ?>
+    <?= $this->renderPartials(['navbar', 'top-banner']); ?>
 
     <section>
         <div class="container mx-auto p-4 mt-4">

@@ -1,11 +1,13 @@
 <?php
 
-if ($output = loadView(
-    'listings/create',
-    [
-        'title' => 'Post a Job'
-    ]
-))
+use Framework\Template;
+
+$template = new Template();
+
+if ($output = $template->render(
+    'listings/create', ['title' => 'Post a Job']
+)) {
     echo $output;
-else
+} else {
     echo "Error loading post a job view.";
+}

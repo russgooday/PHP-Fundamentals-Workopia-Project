@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<?= loadPartial('head', ['title' => $title ?? '']); ?>
+<?= $this->renderPartial('head', ['title' => $title ?? '']); ?>
 
 <body class="bg-gray-100">
-    <?= loadPartials(['navbar', 'showcase-search', 'top-banner']); ?>
+    <?= $this->renderPartials(['navbar', 'showcase-search', 'top-banner']); ?>
 
     <!-- Job Listings -->
     <section>
@@ -171,7 +171,7 @@
             </a>
     </section>
 
-    <?= loadPartial('bottom-banner') ?>
+    <?= $this->renderPartial('bottom-banner') ?>
 
 </body>
 

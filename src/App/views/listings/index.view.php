@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<?= loadPartial('head', ['page' => ['title' => 'Listings']]) ?>
+<?= $this->renderPartial('head', ['page' => ['title' => 'Listings']]) ?>
 <body class="bg-gray-100">
-    <?= loadPartials(['navbar', 'top-banner']); ?>
+    <?= $this->renderPartials(['navbar', 'top-banner']); ?>
 
     <!-- Job Listings -->
     <section>
@@ -173,7 +173,7 @@
             </div>
     </section>
 
-    <?= loadPartial('bottom-banner'); ?>
+    <?= $this->renderPartial('bottom-banner'); ?>
 
 </body>
 
