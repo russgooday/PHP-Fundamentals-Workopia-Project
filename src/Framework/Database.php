@@ -2,31 +2,21 @@
 namespace Framework;
 
 use PDO;
-use PDOStatement;
 use PDOException;
 
-require_once __DIR__ . '/../App/helpers/path.php';
-
-require_once basePath('src/App/helpers/debug.php');
-require_once basePath('src/App/helpers/logging.php');
-
 class Database {
-    private ?PDO $pdo = null;
+    private static ?PDO $pdo = null;
 
-    public function __construct(
-        private array $env
-    ) {}
-
-    public function getConnection(): PDO {
-        extract($this->env);
-
-        if ($this->pdo === null) {
+    public static function getConnection(): PDO {
+        if (is_null(self::$pdo)) {
+            // Temporary measure!!
+            extract(parse_ini_file('.env'));
 
             $dsn = "mysql:host={$host};port=3306;dbname={$dbname};charset=utf8";
 
             try {
 
-                $this->pdo = new PDO(
+                self::$pdo = new PDO(
                     $dsn,
                     $user,
                     $password,
@@ -36,18 +26,12 @@ class Database {
                     ]
                 );
             } catch (PDOException $err) {
+
                 logError("Database connection failed: " . $err->getMessage());
                 die("Database connection failed.");
             }
         }
 
-        return $this->pdo;
-    }
-
-    public function query(string $sql, array $params = []): PDOStatement {
-        $stmt = $this->getConnection()->prepare($sql);
-        $stmt->execute($params);
-
-        return $stmt;
+        return self::$pdo;
     }
 }

@@ -2,6 +2,8 @@
 /vendor
 /node_modules
 /config/db.php
+/old_files
+/dev
 .env
 .vscode
 .DS_Store

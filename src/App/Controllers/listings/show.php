@@ -6,12 +6,12 @@ $template = new Template();
 $listings = new Listings();
 
 if ($output = $template->render(
-    'listings/index', [
-        'title' => 'Listings',
-        'listings' => $listings->findAll(4)
+    'listings/show', [
+        'title' => 'Job Details',
+        'job' => $listings->findOne($job_id)
     ]
 )) {
     echo $output;
 } else {
-    echo "Error loading listings view.";
+    echo "Error loading show a job view.";
 }

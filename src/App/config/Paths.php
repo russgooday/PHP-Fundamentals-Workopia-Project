@@ -1,13 +1,15 @@
 <?php
 namespace App\Config;
 
-class Paths
+define('ROOT_PATH', str_replace('\\', '/', dirname(__DIR__, 3)));
+
+final class Paths
 {
-    public const VIEWS = __DIR__ . "/../views";
-    public const ROOT = __DIR__ . "/../../..";
-    public const SRC = __DIR__ . "/../..";
-    public const APP = __DIR__ . "/..";
-    public const FRAMEWORK = __DIR__ . "/../../Framework";
-    public const CONTROLLERS = __DIR__ . "/../Controllers";
-    public const CONFIG = __DIR__;
+    public const ROOT        = ROOT_PATH;
+    public const SRC         = ROOT_PATH . '/src';
+    public const APP         = ROOT_PATH . '/src/App';
+    public const VIEWS       = ROOT_PATH . '/src/App/views';
+    public const CONTROLLERS = ROOT_PATH . '/src/App/Controllers';
+    public const FRAMEWORK   = ROOT_PATH . '/src/Framework';
+    public const CONFIG      = ROOT_PATH . '/src/App/Config';
 }

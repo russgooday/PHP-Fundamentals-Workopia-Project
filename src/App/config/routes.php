@@ -9,6 +9,7 @@ class Routes {
             ->get('/', '/home.php')
             ->get('/listings', '/listings/index.php')
             ->get('/listings/create', '/listings/create.php')
+            ->get('/listings/:job_id', '/listings/show.php')
             ->get('/error/:status_code', '/error.php');
 
         return $router;
