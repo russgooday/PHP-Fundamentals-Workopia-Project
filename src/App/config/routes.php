@@ -3,14 +3,14 @@ namespace App\Config;
 use Framework\Router;
 
 class Routes {
-    public static function registerRoutes(Router $router = new Router()): Router {
+    public static function registerRoutes(Router $router): Router {
         // May change target paths to actual controller classes.
         $router
-            ->get('/', '/home.php')
-            ->get('/listings', '/listings/index.php')
-            ->get('/listings/create', '/listings/create.php')
-            ->get('/listings/:job_id', '/listings/show.php')
-            ->get('/error/:status_code', '/error.php');
+            ->get('/', 'HomeController')
+            ->get('/listings', 'ListingsController')
+            ->get('/listings/create', 'ListingsController@create')
+            ->get('/listings/:job_id', 'ListingsController@show')
+            ->get('/error/:status_code', 'ErrorController');
 
         return $router;
     }

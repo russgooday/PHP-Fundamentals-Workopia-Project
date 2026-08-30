@@ -25,7 +25,7 @@ function inspect(mixed $value, string $label = ''): void {
  * @param mixed $value
  * @return void
  */
-function inspectAndDie(mixed $value): void {
-    inspect($value);
+function inspectAndDie(mixed $value, string $label = ''): void {
+    inspect($value, $label);
     die();
 }

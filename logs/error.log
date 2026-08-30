@@ -1,0 +1,63 @@
+[2026-08-29 20:41:11] [uri: /] Error: Array to string conversion in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /] Error: Undefined property: Autoloader::$Array in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /] Error: Trying to access array offset on null in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /] Error: Array to string conversion in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /] Error: Undefined property: Autoloader::$Array in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /] Error: Trying to access array offset on null in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /favicon.ico] Error: Array to string conversion in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /favicon.ico] Error: Undefined property: Autoloader::$Array in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /favicon.ico] Error: Trying to access array offset on null in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /favicon.ico] Error: Array to string conversion in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /favicon.ico] Error: Undefined property: Autoloader::$Array in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-29 20:41:11] [uri: /favicon.ico] Error: Trying to access array offset on null in C:\laragon\www\workopia\autoloader.php on line 28
+[2026-08-30 11:58:14] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:14] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:14] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:14] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:14] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:14] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:14] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:14] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:14] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:14] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:28] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:28] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:28] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:28] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:28] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:28] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:28] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:28] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:28] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:28] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:29] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:29] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:29] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:29] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:29] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:29] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:29] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:29] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:29] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:58:29] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:59:09] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:59:09] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:59:09] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:59:09] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:59:09] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:59:09] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:59:09] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:59:09] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:59:09] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 11:59:09] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:00:32] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:00:32] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:00:32] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:00:32] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:00:32] [uri: /listings/4] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:00:32] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:00:32] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:00:32] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:00:32] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:00:32] [uri: /favicon.ico] Error: Undefined array key 1 in C:\laragon\www\workopia\src\Framework\Router.php on line 22
+[2026-08-30 12:33:41] [uri: /listings/1] Error: Undefined variable $params in C:\laragon\www\workopia\src\Framework\Controller.php on line 7

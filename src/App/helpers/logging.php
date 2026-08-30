@@ -1,6 +1,5 @@
 <?php
-require_once __DIR__ . '/path.php';
-
+use App\Config\Paths;
 /**
  * Log an error message to the error log file
  *
@@ -8,7 +7,7 @@ require_once __DIR__ . '/path.php';
  * @return void
  */
 function logError(string $message): void {
-    $errorLog = basePath('logs/error.log');
+    $errorLog = Paths::ROOT . '/logs/error.log';
     $timestamp = date('Y-m-d H:i:s');
     $requestUri = $_SERVER['REQUEST_URI'] ?? 'CLI';
 

@@ -1,0 +1,7 @@
+GET    /listings           → index   (list all)
+GET    /listings/create    → create  (show the "new" form)
+POST   /listings           → store   (save a new one)
+GET    /listings/:id       → show    (view one)
+GET    /listings/:id/edit  → edit    (show the "edit" form)
+PUT    /listings/:id       → update  (save changes)
+DELETE /listings/:id       → destroy (delete)

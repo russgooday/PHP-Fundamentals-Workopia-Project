@@ -1,6 +1,7 @@
 <?php
 
 namespace Framework;
+
 use App\Config\Paths;
 
 class Router {
@@ -10,6 +11,10 @@ class Router {
         'PUT' => [],
         'DELETE' => []
     ];
+
+    public function __construct(
+        protected Dispatcher $dispatcher
+    ) {}
 
     /**
      * Register a route
@@ -25,6 +30,7 @@ class Router {
         ];
     }
 
+
     /**
      * Add a GET route
      * @param string $uri
@@ -35,6 +41,7 @@ class Router {
         $this->registerRoute('GET', $uri, $controller);
         return $this;
     }
+
 
     /**
      * Add a POST route
@@ -47,6 +54,7 @@ class Router {
         return $this;
     }
 
+
     /**
      * Add a PUT route
      * @param string $uri
@@ -57,6 +65,7 @@ class Router {
         $this->registerRoute('PUT', $uri, $controller);
         return $this;
     }
+
 
     /**
      * Add a DELETE route
@@ -69,30 +78,51 @@ class Router {
         return $this;
     }
 
+
     /**
      * Dispatch the request to the matching route's controller.
      * @param string $uri The request URI to match against registered routes.
      * @param string $method The HTTP method (e.g. 'GET', 'POST').
-     * @param array $params Optional additional parameters.
+     * @param array $requestData The request data (e.g. $_GET, $_POST, etc.) to pass to the controller.
      * @return void
      */
-    public function route(string $uri, string $method, array $params = []): void {
+    public function route(string $uri, string $method, array $requestData = []): void {
+        $found = $this->match($uri, $method);
+
+        if ($found === false) {
+            $this->dispatcher->dispatch([
+                'controller' => 'ErrorController',
+                'params' => ['status_code' => 404]
+            ]);
+            return;
+        }
+
+        $this->dispatcher->dispatch($found, $requestData);
+    }
+
+
+    /**
+     * Matches a URI against registered routes for the given HTTP method.
+     * @param string $uri The request URI to match against registered routes.
+     * @param string $method The HTTP method (e.g. 'GET', 'POST').
+     * @return array|false Returns an array with 'controller' and 'params' if
+     * a match is found, or false if no match is found.
+     */
+    public function match(string $uri, string $method): array|false {
         $method = strtoupper($method);
 
         foreach ($this->routes[$method] as $route) {
-
             if ($matched = $this->routeMatch($route['uri'], $uri)) {
-                extract($matched['params']);
-                include Paths::CONTROLLERS . $route['controller'];
-                return;
+                return [
+                    'controller' => $route['controller'],
+                    'params' => $matched['params'],
+                ];
             }
         }
 
-        $status_code = 404;
-        include Paths::CONTROLLERS . '/error.php';
-
-        exit;
+        return false;
     }
+
 
     /**
      * Checks whether a URI matches a route template and if a match is found
@@ -102,41 +132,38 @@ class Router {
      * @return array{params:array<string,string>}|null
      * @example routeMatch('/listings/:id', '.../listings/23') -> ['params'=>['id'=>'23']]
      */
-    private function routeMatch(string $route, string $uri): ?array {
-        extract($this->buildRegexFrom($route)); // $regex, $param_names
+    function routeMatch(string $route, string $uri): ?array {
         $path = $this->normalisePath(parse_url($uri, PHP_URL_PATH));
+        $regex = $this->buildRegex($route);
 
-        if (preg_match($regex, $path, $m))
-            // stored parameter names are combined with their respective captured values.
-            return ['params' => array_combine($param_names, array_slice($m, 1))];
+        if (preg_match($regex, $path, $matches)) {
+            return ['params' => array_filter(
+                $matches, 'is_string', ARRAY_FILTER_USE_KEY
+            )];
+        }
         return null;
     }
+
 
     /**
      * Builds a regex and parameter-name list.
      * @param string $route The route template, e.g. '/listings/:id/edit'.
      * @param string $delim The regex delimiter to wrap the pattern in.
-     * @return array{regex:string,param_names:array<int,string>}
+     * @return string The regex pattern to match the route.
      */
-    private function buildRegexFrom(string $route, string $delim = '#'): array {
-        $param_names = [];
-        $reg_parts = [];
+    function buildRegex(string $route, string $delim = '#'): string {
+        $parts = $this->splitPathToParts($route);
 
-        foreach ($this->splitPathToParts($route) as $reg_part) {
-
-            if (str_starts_with($reg_part, ':')) {
-                $param_names[] = substr($reg_part, 1);
-                $reg_parts[] = "([^\/]+)";
-            } else {
-                $reg_parts[] = preg_quote($reg_part, $delim);
+        $regexParts = array_map(function (string $part) use ($delim) {
+            if (str_starts_with($part, ':')) {
+                return '(?P<' . substr($part, 1) . '>[^/]+)';
             }
-        }
+            return preg_quote($part, $delim);
+        }, $parts);
 
-        return [
-            'regex' => $delim . "^\/" . implode('\/', $reg_parts) . "$" . $delim,
-            'param_names' => $param_names
-        ];
+        return $delim . '^/' . implode('/', $regexParts) . '$' . $delim;
     }
+
 
     /**
      * Split a path into parts,
@@ -146,6 +173,7 @@ class Router {
     private function splitPathToParts(string $path): array {
         return explode('/', trim($path, '/'));
     }
+
 
     /**
      * Normalises a path by ensuring it starts with a single leading slash.

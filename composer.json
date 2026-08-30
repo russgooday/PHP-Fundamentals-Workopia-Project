@@ -1,0 +1,16 @@
+{
+    "name": "russgooday/php-fundamentals-workopia-project",
+    "description": "Job Listing Application",
+    "authors": [
+        {
+            "name": "Russell Gooday",
+            "email": "support@rpgdigital.co.uk"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Framework\\": "src/Framework/",
+            "App\\": "src/App/"
+        }
+    }
+}
