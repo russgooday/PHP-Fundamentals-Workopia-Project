@@ -3,7 +3,7 @@ namespace Framework;
 use App\Config\Paths;
 use Throwable;
 
-class Template {
+class Viewer {
 
     protected array $globalData = [];
 

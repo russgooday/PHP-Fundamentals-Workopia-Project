@@ -2,19 +2,19 @@
 namespace App\Controllers;
 
 use Framework\Controller;
-use Framework\Template;
+use Framework\Viewer;
 use App\Config\HttpErrorMessages;
 
 class ErrorController extends Controller {
 
     public function __construct(
-        protected Template $template = new Template(),
-        protected HttpErrorMessages $messages = new HttpErrorMessages()
+        protected Viewer $viewer,
+        protected HttpErrorMessages $messages
     ) {}
 
-    public function index(array $params): void {
-        if ($output = $this->template->render(
-            'error', $this->messages->fetchError($params['status_code'] ?? 500)
+    public function index(int $status_code): void {
+        if ($output = $this->viewer->render(
+            'error', $this->messages->fetchError($status_code ?? 500)
         )) {
             echo $output;
         } else {

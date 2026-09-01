@@ -1,20 +1,20 @@
 <?php
 namespace App\Controllers;
 use Framework\Controller;
-use Framework\Template;
+use Framework\Viewer;
 use App\Models\Listings;
 
 class ListingsController extends Controller {
 
     public function __construct(
-        protected Template $template = new Template(),
-        protected Listings $listings = new Listings()
+        private Viewer $viewer,
+        private Listings $listings
     ) {}
 
 
     public function index(): void {
 
-        if ($output = $this->template->render(
+        if ($output = $this->viewer->render(
             'listings/index', [
                 'title' => 'Listings',
                 'listings' => $this->listings->findAll(4)
@@ -27,12 +27,12 @@ class ListingsController extends Controller {
     }
 
 
-    public function show(array $params): void {
+    public function show(string $job_id): void {
 
-        if ($output = $this->template->render(
+        if ($output = $this->viewer->render(
             'listings/show', [
                 'title' => 'Job Details',
-                'job' => $this->listings->findOne($params['job_id'] ?? null)
+                'job' => $this->listings->findOne($job_id)
             ]
         )) {
             echo $output;
@@ -44,7 +44,7 @@ class ListingsController extends Controller {
 
     public function create(): void {
 
-        if ($output = $this->template->render(
+        if ($output = $this->viewer->render(
             'listings/create', [
                 'title' => 'Create a Job Listing'
             ]

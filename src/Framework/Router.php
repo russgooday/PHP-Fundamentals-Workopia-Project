@@ -2,8 +2,6 @@
 
 namespace Framework;
 
-use App\Config\Paths;
-
 class Router {
     protected $routes = [
         'GET' => [],
@@ -12,9 +10,6 @@ class Router {
         'DELETE' => []
     ];
 
-    public function __construct(
-        protected Dispatcher $dispatcher
-    ) {}
 
     /**
      * Register a route
@@ -77,29 +72,6 @@ class Router {
         $this->registerRoute('DELETE', $uri, $controller);
         return $this;
     }
-
-
-    /**
-     * Dispatch the request to the matching route's controller.
-     * @param string $uri The request URI to match against registered routes.
-     * @param string $method The HTTP method (e.g. 'GET', 'POST').
-     * @param array $requestData The request data (e.g. $_GET, $_POST, etc.) to pass to the controller.
-     * @return void
-     */
-    public function route(string $uri, string $method, array $requestData = []): void {
-        $found = $this->match($uri, $method);
-
-        if ($found === false) {
-            $this->dispatcher->dispatch([
-                'controller' => 'ErrorController',
-                'params' => ['status_code' => 404]
-            ]);
-            return;
-        }
-
-        $this->dispatcher->dispatch($found, $requestData);
-    }
-
 
     /**
      * Matches a URI against registered routes for the given HTTP method.

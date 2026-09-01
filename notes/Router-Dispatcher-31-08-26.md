@@ -1,0 +1,4 @@
+- `Dispatcher` gets `Router` injected via constructor, no default.
+- `Dispatcher` gains the "find the route, then act on it" responsibility — probably a `handle(string $uri, string $method, array $requestData = [])` method that calls `$this->router->match(...)` internally, then does what your current `dispatch()` does with the result.
+- `Router` loses its `Dispatcher` dependency entirely — `route()` likely goes away, `match()` stays as the only public matching method.
+- `index.php` becomes `$dispatcher = new Dispatcher(new Router(...))` then `$dispatcher->handle($uri, $method)`.
