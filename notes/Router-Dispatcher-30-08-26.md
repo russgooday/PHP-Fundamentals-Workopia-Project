@@ -1,8 +1,4 @@
-Sounds good — good place to pause. Quick recap of where things stand so it's easy to pick back up:
-
 - **`Router`** — matches only, no controller knowledge. Bucketed by method, unchanged since your original.
 - **`Dispatcher`** — takes `resolve()`'d `Controller@action` strings, instantiates, calls. Constructed once, injected everywhere, no defaults.
 - **`match()` return shape** — `['params' => [...]]` wrapped, so truthiness checks stay safe even when params is empty. Root cause of today's "all routes 404" was a caller expecting that wrapper after it briefly went missing — worth double-checking that fix is in before you move on.
 - **Params vs literals in regex** — literals need `preg_quote()`'d before assembly, named groups built after, never the other way round.
-
-Open for another day: the `class_exists` guard, `ErrorController@action` naming, and the test suite.
