@@ -80,7 +80,7 @@ class Router {
      * @return array|false Returns an array with 'controller' and 'params' if
      * a match is found, or false if no match is found.
      */
-    public function match(string $uri, string $method): array|false {
+    public function match(string $uri, string $method = 'GET'): array|false {
         $method = strtoupper($method);
 
         foreach ($this->routes[$method] as $route) {

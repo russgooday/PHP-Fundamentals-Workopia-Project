@@ -3,7 +3,7 @@ namespace App\Config;
 use Framework\Router;
 
 class Routes {
-    public static function registerRoutes(Router $router): Router {
+    public static function register(Router $router): Router {
         // May change target paths to actual controller classes.
         $router
             ->get('/', 'HomeController')

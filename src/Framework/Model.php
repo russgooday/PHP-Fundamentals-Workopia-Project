@@ -8,8 +8,12 @@ use PDOException;
 
 abstract class Model {
 
+    public function __construct(
+        private Database $database
+    ){}
+
     protected function getConnection(): PDO {
-        return Database::getConnection();
+        return $this->database->getConnection();
     }
 
 

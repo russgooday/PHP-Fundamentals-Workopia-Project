@@ -5,21 +5,25 @@ use PDO;
 use PDOException;
 
 class Database {
-    private static ?PDO $pdo = null;
+    private ?PDO $pdo = null;
 
-    public static function getConnection(): PDO {
-        if (is_null(self::$pdo)) {
-            // Temporary measure!!
-            extract(parse_ini_file('.env'));
+    public function __construct(
+        private string $host,
+        private string $dbname,
+        private string $user,
+        private string $password
+    ){}
 
-            $dsn = "mysql:host={$host};port=3306;dbname={$dbname};charset=utf8";
+    public function getConnection(): PDO {
+        if (is_null($this->pdo)) {
+            $dsn = "mysql:host={$this->host};port=3306;dbname={$this->dbname};charset=utf8";
 
             try {
 
-                self::$pdo = new PDO(
+                $this->pdo = new PDO(
                     $dsn,
-                    $user,
-                    $password,
+                    $this->user,
+                    $this->password,
                     [
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
@@ -32,6 +36,6 @@ class Database {
             }
         }
 
-        return self::$pdo;
+        return $this->pdo;
     }
 }
