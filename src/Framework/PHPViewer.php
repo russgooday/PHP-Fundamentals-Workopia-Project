@@ -3,7 +3,7 @@ namespace Framework;
 use App\Config\Paths;
 use Throwable;
 
-class Viewer {
+class PHPViewer implements ViewerInterface {
 
     protected array $globalData = [];
 

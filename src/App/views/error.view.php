@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <?= $this->render('partials/head', ['title' => "{$status_code} {$title}"]); ?>
-
+<!-- ? inspect(get_defined_vars()); ? -->
 <body class="bg-gray-100">
     <?= $this->render('partials/navbar') ?>
     <?= $this->render('partials/top-banner') ?>
@@ -12,6 +12,7 @@
                 Error <?= e("{$status_code} : {$title}"); ?>
             </div>
             <p class="text-center text-2xl mb-4"><?= e($message) ?></p>
+            <a href="/" class="block text-center text-blue-500 hover:underline">Go back to Home</a>
         </div>
     </section>
 </body>

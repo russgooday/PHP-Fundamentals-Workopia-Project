@@ -2,6 +2,7 @@
 namespace Framework;
 
 use ReflectionMethod;
+use App\Controllers\ErrorController;
 
 class Dispatcher {
 
@@ -24,12 +25,35 @@ class Dispatcher {
         [$controller, $action] = $this->parseController($routeData['controller']);
 
         // get the controller class and resolve its dependencies
-        $controller_class = $this->container->resolve($controller);
+        $controller_class = $this->getController($controller);
 
         // get the required controller method arguments from the route parameters
         $args = $this->getMethodArguments($controller_class, $action, $routeData['params']);
 
-        $controller_class->$action(...$args);
+        try {
+            $controller_class->$action(...$args);
+        } catch (Exceptions\HttpException $e) {
+            http_response_code($e->getCode());
+
+            $errorController = $this->getController(ErrorController::class);
+            $errorController->index($e->getCode(), $e->getMessage());
+        }
+        // $controller_class->$action(...$args); // This line is now redundant because the call is handled in the try block.
+    }
+
+
+    /**
+     * Gets the controller class from the container and sets the viewer.
+     *
+     * @param string $controllerClass The fully qualified class name of the controller.
+     * @return object The controller instance with the viewer set.
+     */
+    function getController(string $controllerClass): object {
+        $container = $this->container;
+
+        return $container
+            ->resolve($controllerClass)
+            ->setViewer($container->resolve(ViewerInterface::class));
     }
 
     /**
@@ -54,17 +78,15 @@ class Dispatcher {
      * to pick out the required arguments from the route params array.
      *
      * @param Controller $controller The controller instance.
-     * @param string $methodName The name of the method to inspect.
+     * @param string $method The name of the method to inspect.
      * @param array $params The route parameters to match against.
      * @return array An array of arguments to pass to the controller method.
      */
-    protected function getMethodArguments(
-        Controller $controller, string $methodName, array $params
-    ): array {
-        $reflection = new ReflectionMethod($controller, $methodName);
+    protected function getMethodArguments(Controller $controller, string $method, array $params): array {
+        $reflection = new ReflectionMethod($controller, $method);
 
         return array_map(
-            fn ($param) => castTo($param->getType(), $params[$param->getName()]),
+            fn ($param) => castTo($param->getType(), $params[$param->getName()] ?? null),
             $reflection->getParameters()
         );
     }

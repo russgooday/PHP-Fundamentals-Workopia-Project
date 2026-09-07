@@ -1,13 +1,13 @@
 <?php
 namespace App\Controllers;
-use Framework\Controller;
-use Framework\Viewer;
-use App\Models\Listings;
+
+use Framework\Exceptions\HttpException,
+    Framework\Controller,
+    App\Models\Listings;
 
 class ListingsController extends Controller {
 
     public function __construct(
-        private Viewer $viewer,
         private Listings $listings
     ) {}
 
@@ -22,22 +22,21 @@ class ListingsController extends Controller {
         )) {
             echo $output;
         } else {
-            echo "Error loading listings view.";
+            echo 'Sorry no jobs';
         }
     }
 
 
-    public function show(string $job_id): void {
-
-        if ($output = $this->viewer->render(
-            'listings/show', [
-                'title' => 'Job Details',
-                'job' => $this->listings->findOne($job_id)
-            ]
-        )) {
-            echo $output;
+    public function show(int $job_id): void {
+        if ($job = $this->listings->findOne($job_id)) {
+            echo ($this->viewer->render(
+                'listings/show', ['title' => 'Job Details', 'job' => $job]
+            ));
         } else {
-            echo "Error loading show a job view.";
+            throw new HttpException(
+                404, "Sorry, that job doesn't exist", "/listings"
+            );
+            // echo $this->error(404, "Sorry, that job doesn't exist");
         }
     }
 
@@ -51,7 +50,7 @@ class ListingsController extends Controller {
         )) {
             echo $output;
         } else {
-            echo "Error loading create a job view.";
+            throw new HttpException(404, 'Create a job view not found');
         }
     }
 }

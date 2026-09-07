@@ -1,8 +1,7 @@
 <?php
+namespace Spikes;
 
-namespace Framework;
-
-use Closure, ReflectionClass,InvalidArgumentException;
+use Closure, ReflectionClass, InvalidArgumentException;
 
 class Container {
     private array $registry = [];
@@ -22,21 +21,14 @@ class Container {
 
 
     /**
-     * Resolves and returns a service by name.
+     * Instantiates a class and recursively resolves its constructor dependencies.
      *
-     * Registered services are created by their factory closure. If no factory
-     * is registered, the name is treated as a class name and the class is
-     * instantiated with its constructor dependencies resolved recursively.
+     * Classes without constructor parameters are instantiated directly. Each
+     * constructor parameter is expected to have a named class type and is
+     * resolved in the same way before being passed to the constructor.
      *
-     * Resolved services are cached and reused on subsequent calls preventing
-     * multiple instantiations of the same service e.g. a database connection.
-     *
-     * Classes with constructors that require built-in types must be registered explicitly
-     * with a callback that instantiates the class. An example would be a database class
-     * that requires instantiating with config string parameters.
-     *
-     * @param string $class_name Service name or fully qualified class name.
-     * @return object The resolved service instance.
+     * @param string $class_name Fully qualified class name to instantiate.
+     * @return object Instantiated class with its dependencies resolved.
      */
     public function resolve(string $class_name) {
 
@@ -52,6 +44,7 @@ class Container {
             $reflectionClass = new ReflectionClass($class_name);
             $args = [];
 
+            // has constructor and parameters
             if ($params = $reflectionClass->getConstructor()?->getParameters()) {
 
                 foreach ($params as $param) {
@@ -60,7 +53,8 @@ class Container {
                     if (is_null($type) or $type->isBuiltin()) {
 
                         throw new InvalidArgumentException(
-                            "Unable to resolve {$class_name}'s constructor '$type' parameter '{$param->getName()}' "
+                            "Unable to resolve {$class_name}'s " .
+                            "constructor '$type' parameter '{$param->getName()}' "
                         );
                     }
 

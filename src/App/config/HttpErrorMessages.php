@@ -26,16 +26,26 @@ class HttpErrorMessages {
      * Fetch error
      *
      * @param int $status_code
+     * @param string $custom_message
      * @return array<string,string|int>
      * Returns an array with keys 'status_code', 'title', and 'message'.
      */
-    public function fetchError(int $status_code = 500): array {
-        $messages = $this->messages;
+    public function fetchError(int $status_code, string $custom_message = ''): array {
+        $http_errors = $this->messages;
 
         // default to 500 if the status code is not defined in the messages array
-        if (!array_key_exists($status_code, $messages))
+        if (!array_key_exists($status_code, $http_errors))
             $status_code = 500;
 
-        return array_merge(['status_code' => $status_code], $messages[$status_code]);
+        $status_code_error = $http_errors[$status_code];
+
+        $http_error = [
+            'status_code' => $status_code,
+            'title' => $status_code_error['title']
+        ];
+
+        $http_error['message'] = ($custom_message ?: $status_code_error['message']);
+
+        return $http_error;
     }
 }

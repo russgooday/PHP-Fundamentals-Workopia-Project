@@ -1,29 +1,22 @@
 <?php
-// require __DIR__ . '/../vendor/autoload.php';
-require_once '../src/App/config/Paths.php';
 require_once '../src/App/functions.php';
 require_once '../autoloader.php';
-
-use
-    Framework\Container,
-    Framework\Database,
-    Framework\Router,
-    Framework\Dispatcher,
-    Framework\Request,
-    App\Config\Routes;
 
 $auto_loader = (new Autoloader())
     ->addNamespace('App\\', 'src/App/')
     ->addNamespace('Framework\\', 'src/Framework/')
     ->register();
 
-$container = new Container;
-
-$container->register(Database::class, fn() => new Database(...parse_ini_file('.env')));
+use Framework\Container,
+    Framework\Router,
+    Framework\Dispatcher,
+    Framework\Request,
+    App\Config\Services,
+    App\Config\Routes;
 
 $router = Routes::register(new Router);
 
-$container = Dependencies::register(new Container);
+$container = Services::register(new Container);
 
 $dispatcher = new Dispatcher($router, $container);
 

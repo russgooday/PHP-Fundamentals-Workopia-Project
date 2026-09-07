@@ -85,9 +85,10 @@ class Router {
 
         foreach ($this->routes[$method] as $route) {
             if ($matched = $this->routeMatch($route['uri'], $uri)) {
+
                 return [
                     'controller' => $route['controller'],
-                    'params' => $matched['params'],
+                    'params' => $matched['params']
                 ];
             }
         }
@@ -104,38 +105,35 @@ class Router {
      * @return array{params:array<string,string>}|null
      * @example routeMatch('/listings/:id', '.../listings/23') -> ['params'=>['id'=>'23']]
      */
-    function routeMatch(string $route, string $uri): ?array {
-        $path = $this->normalisePath(parse_url($uri, PHP_URL_PATH));
-        $regex = $this->buildRegex($route);
+    public function routeMatch(string $route, string $uri, string $rx='#^\{([^}]+)\}$#'): ?array {
+        $uri = $this->normalisePath(parse_url($uri, PHP_URL_PATH));
 
-        if (preg_match($regex, $path, $matches)) {
-            return ['params' => array_filter(
-                $matches, 'is_string', ARRAY_FILTER_USE_KEY
-            )];
-        }
-        return null;
-    }
+        $route_parts = $this->splitPathToParts($route);
+        $uri_parts = $this->splitPathToParts($uri);
+        $params = [];
 
+        // early exit if a different number of parts
+        if (count($uri_parts) !== count($route_parts)) return null;
 
-    /**
-     * Builds a regex and parameter-name list.
-     * @param string $route The route template, e.g. '/listings/:id/edit'.
-     * @param string $delim The regex delimiter to wrap the pattern in.
-     * @return string The regex pattern to match the route.
-     */
-    function buildRegex(string $route, string $delim = '#'): string {
-        $parts = $this->splitPathToParts($route);
+        foreach ($route_parts as $i => $route_part) {
+            $uri_part = $uri_parts[$i];
 
-        $regexParts = array_map(function (string $part) use ($delim) {
-            if (str_starts_with($part, ':')) {
-                return '(?P<' . substr($part, 1) . '>[^/]+)';
+            // we have found a matching literal
+            if ($route_part === $uri_part) {
+                continue;
             }
-            return preg_quote($part, $delim);
-        }, $parts);
 
-        return $delim . '^/' . implode('/', $regexParts) . '$' . $delim;
+            // we have found a matching parameter
+            if (preg_match($rx, $route_part, $matches)) {
+                $params[$matches[1]] = $uri_part;
+                continue;
+            }
+            // not a match, so exit with false
+            return null;
+        }
+
+        return ['uri' => $uri, 'params' => $params];
     }
-
 
     /**
      * Split a path into parts,

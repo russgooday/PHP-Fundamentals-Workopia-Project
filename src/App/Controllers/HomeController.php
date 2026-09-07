@@ -1,14 +1,13 @@
 <?php
 namespace App\Controllers;
 
-use Framework\Controller;
-use Framework\Viewer;
-use App\Models\Listings;
+use Framework\Exceptions\HttpException,
+    Framework\Controller,
+    App\Models\Listings;
 
 class HomeController extends Controller {
 
     public function __construct(
-        protected Viewer $viewer,
         protected Listings $listings
     ) {}
 
@@ -22,7 +21,7 @@ class HomeController extends Controller {
         )) {
             echo $output;
         } else {
-            echo "Error loading home view.";
+            throw new HttpException(404, 'Page not found');
         }
     }
 }

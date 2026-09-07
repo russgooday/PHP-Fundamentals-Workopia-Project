@@ -12,5 +12,8 @@
             "Framework\\": "src/Framework/",
             "App\\": "src/App/"
         }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^13.3"
     }
 }
