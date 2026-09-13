@@ -10,7 +10,9 @@ class Routes {
             ->get('/listings', 'ListingsController')
             ->get('/listings/create', 'ListingsController@create')
             ->get('/listings/{job_id}', 'ListingsController@show')
-            ->get('/error/{status_code}', 'ErrorController');
+            ->get('/error/{status_code}', 'ErrorController')
+
+            ->post('/listings/store', 'ListingsController@store');
 
         return $router;
     }

@@ -1,9 +1,9 @@
 <?php
 namespace Framework;
 
-use App\Config\HttpErrorMessages;
-
 abstract class Controller {
+
+    protected Request $request;
     protected ViewerInterface $viewer;
 
     public function setViewer(ViewerInterface $viewer): self {
@@ -11,10 +11,8 @@ abstract class Controller {
         return $this;
     }
 
-    public function error(int $statusCode, string $message = ''): ?string {
-        $error_message = (new HttpErrorMessages())->fetchError($statusCode, $message);
-        http_response_code($error_message['status_code']);
-
-        return $this->viewer->render('error', $error_message);
+    public function setRequest(Request $request): self {
+        $this->request = $request;
+        return $this;
     }
 }

@@ -13,7 +13,6 @@ class Dispatcher {
         private Container $container
     ){}
 
-
     public function dispatch(Request $request): void {
         // get the controller and route parameters from the router
         if (!$routeData = $this->router->match($request->uri, $request->method)) {
@@ -27,18 +26,20 @@ class Dispatcher {
         // get the controller class and resolve its dependencies
         $controller_class = $this->getController($controller);
 
+        // set the viewer for the controller
+        $controller_class->setViewer($this->container->resolve(ViewerInterface::class));
+
         // get the required controller method arguments from the route parameters
         $args = $this->getMethodArguments($controller_class, $action, $routeData['params']);
 
         try {
             $controller_class->$action(...$args);
+
         } catch (Exceptions\HttpException $e) {
-            http_response_code($e->getCode());
 
             $errorController = $this->getController(ErrorController::class);
-            $errorController->index($e->getCode(), $e->getMessage());
+            $errorController->index($e->getCode(), $e->getMessage(), $e->getReturnUrl());
         }
-        // $controller_class->$action(...$args); // This line is now redundant because the call is handled in the try block.
     }
 
 
@@ -72,22 +73,47 @@ class Dispatcher {
         return [ $this->namespace . $controller, $action ?? 'index' ];
     }
 
-
     /**
      * Gets the parameter names from the controller method and uses them
      * to pick out the required arguments from the route params array.
      *
      * @param Controller $controller The controller instance.
      * @param string $method The name of the method to inspect.
-     * @param array $params The route parameters to match against.
+     * @param array $uri_params The route parameters to match against.
      * @return array An array of arguments to pass to the controller method.
      */
-    protected function getMethodArguments(Controller $controller, string $method, array $params): array {
+    protected function getMethodArguments(Controller $controller, string $method, array $uri_params): array {
         $reflection = new ReflectionMethod($controller, $method);
 
         return array_map(
-            fn ($param) => castTo($param->getType(), $params[$param->getName()] ?? null),
+            fn($param) => $this->getParamValue($param, $uri_params),
             $reflection->getParameters()
         );
+    }
+
+    /**
+     * Gets the value for a given parameter from the route parameters.
+     *
+     * @param \ReflectionParameter $param The parameter to get the value for.
+     * @param array $uri_params The route parameters to match against.
+     * @return mixed The value for the parameter.
+     * @throws \InvalidArgumentException If the parameter is required but not provided.
+     */
+    protected function getParamValue(\ReflectionParameter $param, array $uri_params) {
+        $name = $param->getName();
+        // have a match in the route parameters
+        if (isset($uri_params[$name])) {
+            return castTo($param->getType(), $uri_params[$name]);
+
+        // or has a default value for the parameter
+        } elseif ($param->isDefaultValueAvailable()) {
+            return $param->getDefaultValue();
+
+        // or is nullable
+        } elseif ($param->allowsNull()) {
+            return null;
+        }
+
+        throw new \InvalidArgumentException("Missing required parameter '{$name}'.");
     }
 }

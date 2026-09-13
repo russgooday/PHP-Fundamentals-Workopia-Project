@@ -20,3 +20,23 @@ function castTo(?string $type, mixed $val): mixed {
         default  => $val
     };
 }
+
+
+/**
+ * Parses a locale-aware numeric string into a float, or null if it isn't numeric.
+ *
+ * @param string|null $value The value to parse.
+ * @return float|null The parsed float value, or null if not numeric.
+ * @example: "1,234.56" will be parsed as 1234.56.
+ */
+function toFloat(?string $value): ?float {
+    // trying to parse null will cause a fatal Error
+    if ($value === null) {
+        return null;
+    }
+    // note PHP 8.1+ allows static variables in functions
+    static $formatter = new NumberFormatter('en_US', NumberFormatter::DECIMAL);
+    $result = $formatter->parse($value);
+
+    return $result === false ? null : (float) $result;
+}

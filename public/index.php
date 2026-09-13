@@ -14,9 +14,11 @@ use Framework\Container,
     App\Config\Services,
     App\Config\Routes;
 
+$request = new Request;
+
 $router = Routes::register(new Router);
 
-$container = Services::register(new Container);
+$container = Services::register(new Container, $request);
 
 $dispatcher = new Dispatcher($router, $container);
 

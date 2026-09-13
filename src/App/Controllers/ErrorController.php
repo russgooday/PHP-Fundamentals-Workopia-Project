@@ -10,14 +10,14 @@ class ErrorController extends Controller {
         protected HttpErrorMessages $messages
     ) {}
 
-    public function index(int $status_code, string $message = ''): void {
-        $error_message = $this->messages->fetchError($status_code, $message);
+    public function index(
+        int $status_code,
+        ?string $message = null,
+        ?string $return_url = null
+    ): void {
+        $error_message = $this->messages->fetchError($status_code, $message, $return_url);
         http_response_code($error_message['status_code']);
 
-        if ($view = $this->viewer->render('error', $error_message)) {
-            echo $view;
-        } else {
-            echo "Error loading error view.";
-        }
+        echo $this->viewer->render('error', $error_message);
     }
 }
