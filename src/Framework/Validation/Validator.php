@@ -6,7 +6,8 @@ class Validator {
     protected array $size_rules = ['min', 'max', 'between'];
     protected array $errors = [];
 
-    use ValidatorChecks;
+    // Instance of ValidatorChecks to perform the actual validation logic.
+    private ValidatorChecks $checks;
 
     /**
      * @param array $data The data to validate, keyed by attribute name.
@@ -17,7 +18,33 @@ class Validator {
         private array $data,
         private array $rules,
         private array $messages
-    ) {}
+    ) {
+        $this->checks = new ValidatorChecks();
+        $this->data = $this->trimStrings($data);
+    }
+
+
+    /**
+     * Trims all string values in the given data array,
+     * optionally excluding certain keys.
+     *
+     * @param array $data The data array to trim.
+     * @param array $exclude The keys to exclude from trimming.
+     * @return array The trimmed data array.
+     */
+    public function trimStrings(array $data, array $exclude = []): array {
+        $exclude = array_flip($exclude);
+        $trimmed = $data;
+
+        foreach($data as $key => $value) {
+            if (isset($exclude[$key])) {
+                continue;
+            }
+            $trimmed[$key] = trim($value);
+        }
+
+        return $trimmed;
+    }
 
     /**
      * Validates the data against the rules, collecting an error for each failing attribute.
@@ -38,7 +65,6 @@ class Validator {
         return empty($this->errors);
     }
 
-
     /**
      * Runs an attribute's value through its rules in order, stopping at the first
      * skip or failure.
@@ -51,15 +77,18 @@ class Validator {
      */
     private function validateAttribute(string $attrib, ?string $value, array $rules): ?string {
         $rules = $this->sortRules($rules);
+        $checks = $this->checks;
 
         foreach ($rules as $rule) {
             [$rule, $args] = $this->parseRule($rule);
 
-            if (!method_exists($this, $rule)) {
+            if (!method_exists($checks, $rule)) {
                 throw new \Exception("Validation rule '$rule' does not exist.");
             }
 
-            $result = $this->$rule($attrib, $value, ...$args);
+            $result = (in_array($rule, $this->size_rules))
+                ? $checks->$rule($value, findOneOf(['numeric'], $rules, 'string'), ...$args)
+                : $checks->$rule($value);
 
             if ($result === 'skip') {
                 return null;
@@ -67,30 +96,6 @@ class Validator {
 
             if ($result === 'fail') {
                 return $this->getMessage($rule, $attrib, ...$args);
-            }
-        }
-
-        return null;
-    }
-
-
-    /**
-     * Looks up a rule and its parameters for the given attribute.
-     *
-     * @param string $attrib The attribute name.
-     * @param string $rule_to_find The rule name to look for, e.g. 'numeric'.
-     * @return array|null A [rule, args] pair if found, otherwise null.
-     */
-    protected function getRule(string $attrib, string $rule_to_find): ?array {
-        if (!isset($this->rules[$attrib])) {
-            return null;
-        }
-
-        foreach($this->rules[$attrib] as $rule) {
-            [$rule, $args] = $this->parseRule($rule);
-
-            if ($rule === $rule_to_find) {
-                return [$rule, $args];
             }
         }
 
@@ -158,9 +163,8 @@ class Validator {
             $message = $this->messages[$rule];
 
             if (in_array($rule, $this->size_rules)) {
-                $has_numeric = !is_null($this->getRule($attrib, 'numeric'));
-
-                return $message[$has_numeric ? 'numeric' : 'string']($attrib, ...$args);
+                $size_type = findOneOf(['numeric'], $this->rules[$attrib] ?? [], 'string');
+                return $message[$size_type]($attrib, ...$args);
             }
             return $message($attrib);
         }

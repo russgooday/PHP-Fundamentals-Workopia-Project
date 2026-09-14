@@ -32,3 +32,22 @@ if (!function_exists('array_last')) {
         return $array[array_key_last($array)];
     }
 }
+
+/**
+ * Finds the first element in $haystack that matches any of the $needles.
+ *
+ * @param array $needles The values to search for.
+ * @param array $haystack The array to search within.
+ * @param mixed $default The default value to return if none of the needles are found.
+ * @return mixed The first matching needle, or the default value if none are found.
+ */
+function findOneOf(array $needles, array $haystack, mixed $default = null): mixed {
+    $flipped = array_flip($haystack);
+
+    foreach($needles as $needle) {
+        if (isset($flipped[$needle])) {
+            return $needle;
+        }
+    }
+    return $default;
+}

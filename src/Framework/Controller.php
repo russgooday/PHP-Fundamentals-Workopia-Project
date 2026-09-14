@@ -15,4 +15,13 @@ abstract class Controller {
         $this->request = $request;
         return $this;
     }
+
+    public function view(string $template, array $data = []): ?string {
+        return $this->viewer->render($template, $data);
+    }
+
+    public function redirect(string $url): void {
+        header("Location: {$url}");
+        exit;
+    }
 }

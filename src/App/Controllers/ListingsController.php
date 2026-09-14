@@ -16,7 +16,7 @@ class ListingsController extends Controller {
 
     public function index(): void {
         if ($listings = $this->listings->findAll(4)) {
-            echo ($this->viewer->render(
+            echo ($this->view(
                 'listings/index', ['title' => 'Listings', 'listings' => $listings]
             ));
         } else {
@@ -28,7 +28,7 @@ class ListingsController extends Controller {
     public function show(int $job_id): void {
         if ($job = $this->listings->findOne($job_id)) {
 
-            echo ($this->viewer->render(
+            echo ($this->view(
                 'listings/show', ['title' => 'Job Details', 'job' => $job]
             ));
         } else {
@@ -39,7 +39,7 @@ class ListingsController extends Controller {
 
     public function create(): void {
 
-        if ($output = $this->viewer->render(
+        if ($output = $this->view(
             'listings/create', [
                 'title' => 'Create a Job Listing'
             ]
@@ -57,8 +57,20 @@ class ListingsController extends Controller {
      * @return void
      */
     public function store(): void {
-        $this->formRequest->validate();
-        inspectAndDie($this->formRequest->getErrors());
+        $formRequest = $this->formRequest;
+
+        if ($formRequest->validate()) {
+            inspectAndDie($formRequest->sanitized());
+        } else {
+            echo $this->view(
+                'listings/create',
+                [
+                    'errors' => $formRequest->getErrors(),
+                    'listings' => $formRequest->getRequest()->post
+                ]
+            );
+        }
+
         // $data = $this->request->getPostData();
 
         // if ($this->listings->create($data)) {

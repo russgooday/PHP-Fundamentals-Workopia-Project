@@ -7,10 +7,10 @@ use Framework\FormRequest;
 class ListingsFormRequest extends FormRequest {
 
     protected array $rules = [
-        'title'         => ['required', 'max:10'],
+        'title'         => ['required'],
         'description'   => ['required'],
-        'salary'        => ['required', 'numeric', 'between:15000,200000'],
-        'tags'          => ['required'],
+        'salary'        => ['required', 'numeric', 'between:10000,1000000'],
+        'tags'          => ['nullable'],
         'company'       => ['required'],
         'address'       => ['required'],
         'city'          => ['required'],
@@ -21,4 +21,8 @@ class ListingsFormRequest extends FormRequest {
         'benefits'      => ['nullable'],
     ];
 
+    protected array $filter_overrides = [
+        'salary' => ['filter' => FILTER_CALLBACK, 'options' => 'toFloat'],
+        'tags' => ['filter' => FILTER_CALLBACK, 'options' => 'str_split_trim']
+    ];
 }
