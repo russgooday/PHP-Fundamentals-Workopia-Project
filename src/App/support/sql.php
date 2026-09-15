@@ -5,7 +5,7 @@
  * @param array $keys The array of keys to convert.
  * @return string The comma-separated list of column names.
  */
-function toColumns(array $keys): string {
+function createColumns(array $keys): string {
     return implode(', ', $keys);
 }
 
@@ -15,7 +15,7 @@ function toColumns(array $keys): string {
  * @param array $keys The array of keys to convert.
  * @return string The comma-separated list of placeholders.
  */
-function toPlaceholders(array $keys): string {
+function createPlaceholders(array $keys): string {
     return implode(', ', array_map(fn($key) => ":$key", $keys));
 }
 
@@ -33,4 +33,15 @@ function getDataType(mixed $value): int {
     ];
 
     return $types[gettype($value)] ?? PDO::PARAM_STR;
+}
+
+/**
+ * Strip control characters from a string and return null if the result is empty.
+ *
+ * @param string|null $value The string to strip and nullify.
+ * @return string|null The stripped string or null if empty.
+ */
+function stripAndNullify(?string $value): ?string {
+    $value = preg_replace('/[\x00-\x1F\x7F]/', '', $value);
+    return $value === '' ? null : $value;
 }

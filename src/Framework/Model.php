@@ -110,8 +110,8 @@ abstract class Model {
 
         $sql = "
             INSERT
-                INTO $table_name (".toColumns($cols).")
-                VALUES (".toPlaceholders($cols).")
+                INTO $table_name (" . createColumns($cols) . ")
+                VALUES (" . createPlaceholders($cols) . ")
         ";
 
         try {
@@ -126,6 +126,21 @@ abstract class Model {
         } catch (PDOException $err) {
 
             logError("create query failed to execute: " . $err->getMessage());
+            return false;
+        }
+    }
+
+
+    public function delete(int $id): bool {
+        $sql = 'DELETE FROM ' . $this->getTable() . ' WHERE id = :id';
+
+        try {
+            $stmt = $this->getConnection()->prepare($sql);
+            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+
+            return $stmt->execute();
+        } catch (PDOException $err) {
+            logError("delete query failed to execute: " . $err->getMessage());
             return false;
         }
     }

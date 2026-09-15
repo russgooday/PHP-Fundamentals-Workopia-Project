@@ -60,13 +60,15 @@ class ListingsController extends Controller {
         $formRequest = $this->formRequest;
 
         if ($formRequest->validate()) {
-            $data = $formRequest->sanitized();
-            $data['user_id'] = 1;
+            $listings = $formRequest->sanitized();
+            $listings['user_id'] = 1; // temporary user ID for testing
 
-            if ($this->listings->create($data)) {
+            if ($this->listings->create($listings)) {
                 $this->redirect('/listings');
             } else {
-                throw new HttpException(500, "Sorry, there was a problem creating the job listing", "/listings/create");
+                throw new HttpException(
+                    500, "Sorry, there was a problem creating the job listing", "/listings/create"
+                );
             }
         } else {
             echo $this->view(

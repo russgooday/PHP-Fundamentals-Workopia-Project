@@ -8,8 +8,11 @@ use Framework\Validation\Validator,
 abstract class FormRequest {
     protected Validator $validator;
 
+    // Array of validation rules for the form request.
     protected array $rules = [];
-    protected array $filter_overrides = [];
+
+    // Array of callbacks to override default sanitization for specific fields.
+    protected array $sanitize_overrides = [];
 
     public function __construct(
         protected Request $request,
@@ -38,12 +41,16 @@ abstract class FormRequest {
 
     public function sanitized(): array {
         $data = $this->validated();
+        $overrides = $this->sanitize_overrides;
 
-        $filters = array_merge(
-            array_fill_keys(array_keys($data), FILTER_SANITIZE_SPECIAL_CHARS),
-            $this->filter_overrides
-        );
+        foreach ($data as $key => $value) {
+            $callback = $overrides[$key] ?? null;
 
-        return filter_var_array($data, $filters);
+            $data[$key] = is_callable($callback)
+                ? $callback($value)
+                : stripAndNullify($value);
+        }
+
+        return $data;
     }
 }

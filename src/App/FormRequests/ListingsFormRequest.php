@@ -21,7 +21,5 @@ class ListingsFormRequest extends FormRequest {
         'benefits'      => ['nullable'],
     ];
 
-    protected array $filter_overrides = [
-        'salary' => ['filter' => FILTER_CALLBACK, 'options' => 'toFloat']
-    ];
+    protected array $sanitize_overrides = ['salary' => 'toFloat'];
 }
