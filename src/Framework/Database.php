@@ -3,6 +3,7 @@ namespace Framework;
 
 use PDO;
 use PDOException;
+use Pdo\Mysql;
 
 class Database {
     private ?PDO $pdo = null;
@@ -26,7 +27,8 @@ class Database {
                     $this->password,
                     [
                         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                        Mysql::ATTR_INIT_COMMAND => "SET sql_mode='STRICT_TRANS_TABLES'"
                     ]
                 );
             } catch (PDOException $err) {

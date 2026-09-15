@@ -15,7 +15,7 @@ class ListingsController extends Controller {
 
 
     public function index(): void {
-        if ($listings = $this->listings->findAll(4)) {
+        if ($listings = $this->listings->findAll()) {
             echo ($this->view(
                 'listings/index', ['title' => 'Listings', 'listings' => $listings]
             ));
@@ -60,7 +60,14 @@ class ListingsController extends Controller {
         $formRequest = $this->formRequest;
 
         if ($formRequest->validate()) {
-            inspectAndDie($formRequest->sanitized());
+            $data = $formRequest->sanitized();
+            $data['user_id'] = 1;
+
+            if ($this->listings->create($data)) {
+                $this->redirect('/listings');
+            } else {
+                throw new HttpException(500, "Sorry, there was a problem creating the job listing", "/listings/create");
+            }
         } else {
             echo $this->view(
                 'listings/create',
@@ -70,13 +77,5 @@ class ListingsController extends Controller {
                 ]
             );
         }
-
-        // $data = $this->request->getPostData();
-
-        // if ($this->listings->create($data)) {
-        //     redirect('/listings');
-        // } else {
-        //     throw new HttpException(500, "Sorry, there was a problem creating the job listing", "/listings/create");
-        // }
     }
 }

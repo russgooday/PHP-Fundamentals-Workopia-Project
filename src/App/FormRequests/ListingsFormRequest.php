@@ -22,7 +22,6 @@ class ListingsFormRequest extends FormRequest {
     ];
 
     protected array $filter_overrides = [
-        'salary' => ['filter' => FILTER_CALLBACK, 'options' => 'toFloat'],
-        'tags' => ['filter' => FILTER_CALLBACK, 'options' => 'str_split_trim']
+        'salary' => ['filter' => FILTER_CALLBACK, 'options' => 'toFloat']
     ];
 }

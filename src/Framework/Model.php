@@ -98,4 +98,35 @@ abstract class Model {
             return null;
         }
     }
+
+
+    public function create(array $data): bool {
+        if (empty($data)) {
+            return false;
+        }
+
+        $table_name = $this->getTable();
+        $cols = array_keys($data);
+
+        $sql = "
+            INSERT
+                INTO $table_name (".toColumns($cols).")
+                VALUES (".toPlaceholders($cols).")
+        ";
+
+        try {
+            $stmt = $this->getConnection()->prepare($sql);
+
+            foreach ($data as $col => $val) {
+                $stmt->bindValue(":$col", $val, getDataType($val));
+            }
+
+            return $stmt->execute();
+
+        } catch (PDOException $err) {
+
+            logError("create query failed to execute: " . $err->getMessage());
+            return false;
+        }
+    }
 }
