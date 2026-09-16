@@ -51,3 +51,24 @@ function findOneOf(array $needles, array $haystack, mixed $default = null): mixe
     }
     return $default;
 }
+
+
+/**
+ * Filters an array by the specified keys, returning only the allowed key-value pairs.
+ *
+ * @param array $arr The array to filter.
+ * @param array $keys The keys to allow.
+ * @return array The filtered array containing only the allowed key-value pairs.
+ */
+function filter_by_keys(array $arr, array $keys): array {
+    $allowed = [];
+    $flipped = array_flip($keys);
+
+    foreach($arr as $key => $val) {
+        if (isset($flipped[$key])) {
+            $allowed[$key] = $val;
+        }
+    }
+
+    return $allowed;
+}

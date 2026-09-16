@@ -7,6 +7,8 @@ use PDOStatement;
 use PDOException;
 
 abstract class Model {
+    protected string $table;
+    protected array $fillable;
 
     public function __construct(
         private Database $database
@@ -100,10 +102,21 @@ abstract class Model {
     }
 
 
+    /**
+     * Create a new record in the model's table with the provided data.
+     *
+     * @param array $data The data to insert into the table.
+     * @return bool True if the record was successfully created, false otherwise.
+     */
     public function create(array $data): bool {
-        if (empty($data)) {
+        if (empty($data) || empty($this->fillable)) {
             return false;
         }
+
+        // if no allowed entries found then return false
+        if (!($data = filter_by_keys($data, $this->fillable))) {
+            return false;
+        };
 
         $table_name = $this->getTable();
         $cols = array_keys($data);
