@@ -42,16 +42,11 @@ abstract class Model {
      * @return PDOStatement|null The executed PDOStatement or null if the query fails.
      */
     public function query(string $sql, array $params = []): ?PDOStatement {
-        try {
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->execute($params);
 
-            return $stmt;
-        } catch (PDOException $err) {
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->execute($params);
 
-            logError("query failed to execute: " . $err->getMessage());
-            return null;
-        }
+        return $stmt;
     }
 
 
@@ -64,17 +59,11 @@ abstract class Model {
     public function findAll(?int $limit = null): ?array {
         $sql = 'SELECT * FROM ' . $this->getTable() . ' LIMIT :limit';
 
-        try {
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->bindValue(':limit', $limit ?? PHP_INT_MAX, PDO::PARAM_INT);
-            $stmt->execute();
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->bindValue(':limit', $limit ?? PHP_INT_MAX, PDO::PARAM_INT);
+        $stmt->execute();
 
-            return $stmt->fetchAll();
-        } catch (PDOException $err) {
-
-            logError("findAll query failed to execute: " . $err->getMessage());
-            return null;
-        }
+        return $stmt->fetchAll();
     }
 
 
@@ -88,17 +77,12 @@ abstract class Model {
     public function findOne(int $id): mixed {
         $sql = 'SELECT * FROM ' . $this->getTable() . ' WHERE id = :id';
 
-        try {
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-            $stmt->execute();
 
-            return $stmt->fetch();
-        } catch (PDOException $err) {
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
 
-            logError("findOne query failed to execute: " . $err->getMessage());
-            return null;
-        }
+        return $stmt->fetch();
     }
 
 
@@ -118,43 +102,42 @@ abstract class Model {
             return false;
         };
 
-        $table_name = $this->getTable();
         $cols = array_keys($data);
 
         $sql = "
             INSERT
-                INTO $table_name (" . createColumns($cols) . ")
+                INTO {$this->getTable()} (" . createColumns($cols) . ")
                 VALUES (" . createPlaceholders($cols) . ")
         ";
 
-        try {
-            $stmt = $this->getConnection()->prepare($sql);
 
-            foreach ($data as $col => $val) {
-                $stmt->bindValue(":$col", $val, getDataType($val));
-            }
+        $stmt = $this->getConnection()->prepare($sql);
 
-            return $stmt->execute();
-
-        } catch (PDOException $err) {
-
-            logError("create query failed to execute: " . $err->getMessage());
-            return false;
+        foreach ($data as $col => $val) {
+            $stmt->bindValue(":$col", $val, getDataType($val));
         }
+
+        return $stmt->execute();
     }
 
 
+    /**
+     * Delete a record from the model's table by its ID.
+     *
+     * @param int $id The ID of the record to delete.
+     * @return bool True if the record was successfully deleted, false otherwise.
+     */
     public function delete(int $id): bool {
-        $sql = 'DELETE FROM ' . $this->getTable() . ' WHERE id = :id';
+        $sql = "
+            DELETE FROM {$this->getTable()}
+            WHERE id = :id
+        ";
 
-        try {
-            $stmt = $this->getConnection()->prepare($sql);
-            $stmt->bindValue(':id', $id, PDO::PARAM_INT);
-
-            return $stmt->execute();
-        } catch (PDOException $err) {
-            logError("delete query failed to execute: " . $err->getMessage());
-            return false;
-        }
+        $stmt = $this->getConnection()->prepare($sql);
+        $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        // rowCount will give us a clear indication of whether
+        // we are deleting an existing id
+        return $stmt->rowCount() > 0;
     }
 }

@@ -12,7 +12,8 @@ class Routes {
             ->get('/listings/{job_id}', 'ListingsController@show')
             ->get('/error/{status_code}', 'ErrorController')
 
-            ->post('/listings/store', 'ListingsController@store');
+            ->post('/listings/store', 'ListingsController@store')
+            ->delete('/listings/{job_id}', 'ListingsController@delete');
 
         return $router;
     }

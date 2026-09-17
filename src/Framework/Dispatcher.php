@@ -14,8 +14,15 @@ class Dispatcher {
     ){}
 
     public function dispatch(Request $request): void {
+        $method = $request->method;
+
+        // if PUT or DELETE have been passed as a method override
+        if ($method === 'POST' && isset($request->post['_method'])) {
+            $method = $request->post['_method'];
+        }
+
         // get the controller and route parameters from the router
-        if (!$routeData = $this->router->match($request->uri, $request->method)) {
+        if (!$routeData = $this->router->match($request->uri, $method)) {
             http_response_code(404);
             $routeData = $this->router->match('/error/404');
         }
@@ -32,14 +39,7 @@ class Dispatcher {
         // get the required controller method arguments from the route parameters
         $args = $this->getMethodArguments($controller_class, $action, $routeData['params']);
 
-        try {
-            $controller_class->$action(...$args);
-
-        } catch (Exceptions\HttpException $e) {
-
-            $errorController = $this->getController(ErrorController::class);
-            $errorController->index($e->getCode(), $e->getMessage(), $e->getReturnUrl());
-        }
+        $controller_class->$action(...$args);
     }
 
 

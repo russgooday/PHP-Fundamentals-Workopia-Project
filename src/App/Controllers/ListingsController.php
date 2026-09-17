@@ -38,11 +38,8 @@ class ListingsController extends Controller {
 
 
     public function create(): void {
-
         if ($output = $this->view(
-            'listings/create', [
-                'title' => 'Create a Job Listing'
-            ]
+            'listings/create', ['title' => 'Create a Job Listing']
         )) {
             echo $output;
         } else {
@@ -77,6 +74,17 @@ class ListingsController extends Controller {
                     'errors' => $formRequest->getErrors(),
                     'listings' => $formRequest->getRequest()->post
                 ]
+            );
+        }
+    }
+
+
+    public function delete(int $job_id): void {
+        if ($this->listings->delete($job_id)) {
+            $this->redirect('/listings');
+        } else {
+            throw new HttpException(
+                404, "Sorry, that listing could not be deleted", "/listings"
             );
         }
     }
