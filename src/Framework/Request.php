@@ -6,7 +6,7 @@ namespace Framework;
  *  rather than the superglobals themselves, which can be modified by other code.
  */
 class Request {
-    // TODO: A placeholder for now. new self or new static will be introduced.
+
     public string $uri;
     public string $method;
     public array $get;
@@ -23,5 +23,14 @@ class Request {
         $this->files = $_FILES;
         $this->cookie = $_COOKIE;
         $this->server = $_SERVER;
+    }
+
+    public function method(): string {
+        // if PUT or DELETE have been passed as a method override
+        if ($this->method === 'POST' && isset($this->post['_method'])) {
+            return $this->post['_method'];
+        }
+
+        return $this->method;
     }
 }

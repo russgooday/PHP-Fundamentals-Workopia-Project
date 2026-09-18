@@ -86,3 +86,8 @@
 [2026-09-16 21:49:12] [uri: /listings/store] create query failed to execute: SQLSTATE[HY093]: Invalid parameter number: number of bound variables does not match number of tokens
 [2026-09-16 22:53:24] [uri: /listings/1] Error rendering view: extract(): Argument #1 ($array) must be of type array, stdClass given
 [2026-09-16 22:54:13] [uri: /listings/1] Error rendering view: extract(): Argument #1 ($array) must be of type array, stdClass given
+[2026-09-18 05:03:50] [uri: /listings] Error rendering view: session_start() [<a href='/phpmanual/function.session-start'>function.session-start</a>]: Ignoring session_start() because a session is already active (started from C:\laragon\www\workopia\public\index.php on line 2)
+[2026-09-18 05:16:38] [uri: /listings] Error rendering view: Trying to access array offset on null
+[2026-09-18 05:25:54] [uri: /listings] View file 'partials/message' not found at: C:/laragon/www/workopia/src/App/views/partials/message.view.php
+[2026-09-18 05:26:20] [uri: /listings] View file 'partials/message' not found at: C:/laragon/www/workopia/src/App/views/partials/message.view.php
+[2026-09-18 05:26:23] [uri: /listings] View file 'partials/message' not found at: C:/laragon/www/workopia/src/App/views/partials/message.view.php

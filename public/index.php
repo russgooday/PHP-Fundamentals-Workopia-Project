@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 require_once '../src/App/functions.php';
 require_once '../autoloader.php';
 

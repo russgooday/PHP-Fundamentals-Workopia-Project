@@ -79,13 +79,18 @@ class ListingsController extends Controller {
     }
 
 
-    public function delete(int $job_id): void {
-        if ($this->listings->delete($job_id)) {
-            $this->redirect('/listings');
-        } else {
-            throw new HttpException(
-                404, "Sorry, that listing could not be deleted", "/listings"
-            );
-        }
+public function delete(int $job_id): void {
+    if ($this->listings->delete($job_id)) {
+        $_SESSION['flash'] = [
+            'type' => 'success',
+            'message' => 'Listing successfully deleted.'
+        ];
+
+        $this->redirect('/listings');
+    } else {
+        throw new HttpException(
+            404, "Sorry, that listing could not be deleted", "/listings"
+        );
     }
+}
 }

@@ -4,7 +4,6 @@ namespace Framework;
 use Framework\Database;
 use PDO;
 use PDOStatement;
-use PDOException;
 
 abstract class Model {
     protected string $table;
@@ -137,7 +136,7 @@ abstract class Model {
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
         // rowCount will give us a clear indication of whether
-        // we are deleting an existing id
+        // we have successfully deleted an existing id
         return $stmt->rowCount() > 0;
     }
 }
