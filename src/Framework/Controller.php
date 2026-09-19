@@ -20,8 +20,8 @@ abstract class Controller {
         return $this->viewer->render($template, $data);
     }
 
-    public function redirect(string $url): void {
-        header("Location: {$url}");
+    public function redirect(string $url, string $field = 'Location'): void {
+        header("{$field}: {$url}");
         exit;
     }
 }

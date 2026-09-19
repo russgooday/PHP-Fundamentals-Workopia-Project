@@ -4,7 +4,7 @@ unset($_SESSION['flash']);
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<?= $this->render('partials/head', ['title' => 'Listings']) ?>
+<?= $this->render('partials/head', compact('title')) ?>
 <body class="bg-gray-100">
     <?= $this->render('partials/navbar'); ?>
     <?= $this->render('partials/top-banner'); ?>

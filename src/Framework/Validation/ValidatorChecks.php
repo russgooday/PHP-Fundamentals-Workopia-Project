@@ -4,7 +4,7 @@ namespace Framework\Validation;
 
 class ValidatorChecks {
 
-    private function getSize(string $value, string $has_type): int|float {
+    private function _getSize(string $value, string $has_type): int|float {
         $has_numeric = ($has_type === 'numeric');
 
         if ($has_numeric) {
@@ -18,20 +18,20 @@ class ValidatorChecks {
         return mb_strlen($value);
     }
 
-    private function empty(?string $value): bool {
+    private function _empty(?string $value): bool {
         return ($value === null || $value === '');
     }
 
     public function sometimes(?string $value): ?string {
-        return ($this->empty($value)) ? 'skip' : null;
+        return ($this->_empty($value)) ? 'skip' : null;
     }
 
     public function required(?string $value): ?string {
-        return ($this->empty($value)) ? 'fail' : null;
+        return ($this->_empty($value)) ? 'fail' : null;
     }
 
     public function nullable(?string $value): ?string {
-        return ($this->empty($value)) ? 'skip' : null;
+        return ($this->_empty($value)) ? 'skip' : null;
     }
 
     public function numeric(?string $value): ?string {
@@ -39,15 +39,15 @@ class ValidatorChecks {
     }
 
     public function min(string $value, string $has_type, int|float $min): ?string {
-        return ($this->getSize($value, $has_type) < $min) ? 'fail' : null;
+        return ($this->_getSize($value, $has_type) < $min) ? 'fail' : null;
     }
 
     public function max(string $value, string $has_type, int|float $max): ?string {
-        return ($this->getSize($value, $has_type) > $max) ? 'fail' : null;
+        return ($this->_getSize($value, $has_type) > $max) ? 'fail' : null;
     }
 
     public function between(string $value, string $has_type, int|float $min, int|float $max): ?string {
-        $size = $this->getSize($value, $has_type);
+        $size = $this->_getSize($value, $has_type);
 
         return ($size < $min || $size > $max) ? 'fail' : null;
     }

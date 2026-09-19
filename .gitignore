@@ -4,6 +4,7 @@
 /config/db.php
 /old_files
 /dev
+/logs
 .env
 .vscode
 .DS_Store

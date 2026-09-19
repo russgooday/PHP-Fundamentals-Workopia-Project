@@ -58,7 +58,7 @@ class Validator {
         foreach ($this->rules as $attrib => $rules) {
             $value = $data[$attrib] ?? null;
 
-            if ($error = $this->validateAttribute($attrib, $value, $rules)) {
+            if ($error = $this->_validateAttribute($attrib, $value, $rules)) {
                 $this->errors[$attrib] = $error;
             }
         }
@@ -75,12 +75,12 @@ class Validator {
      * @return string|null The error message if a rule fails, otherwise null.
      * @throws \Exception If a rule has no matching check method.
      */
-    private function validateAttribute(string $attrib, ?string $value, array $rules): ?string {
-        $rules = $this->sortRules($rules);
+    private function _validateAttribute(string $attrib, ?string $value, array $rules): ?string {
+        $rules = $this->_sortRules($rules);
         $checks = $this->checks;
 
         foreach ($rules as $rule) {
-            [$rule, $args] = $this->parseRule($rule);
+            [$rule, $args] = $this->_parseRule($rule);
 
             if (!method_exists($checks, $rule)) {
                 throw new \Exception("Validation rule '$rule' does not exist.");
@@ -95,7 +95,7 @@ class Validator {
             }
 
             if ($result === 'fail') {
-                return $this->getMessage($rule, $attrib, ...$args);
+                return $this->_getMessage($rule, $attrib, ...$args);
             }
         }
 
@@ -109,7 +109,7 @@ class Validator {
      * @param string $rule The rule string, e.g. 'between:3,10'.
      * @return array A [name, args] pair, e.g. ['between', ['3', '10']].
      */
-    private function parseRule(string $rule) {
+    private function _parseRule(string $rule) {
         [$rule, $args] = array_pad(explode(':', $rule), 2, []);
 
         if (is_string($args)) {
@@ -127,7 +127,7 @@ class Validator {
      * @param array $rules The rule strings for an attribute.
      * @return array The reordered rule strings.
      */
-    private function sortRules(array $rules) {
+    private function _sortRules(array $rules) {
         $primary_rules = $this->primary_rules;
         $rules = array_flip($rules);
         $sorted = [];
@@ -158,7 +158,7 @@ class Validator {
      * @param string ...$args The rule's arguments, e.g. min/max values.
      * @return string The formatted error message.
      */
-    private function getMessage(string $rule, string $attrib, string ...$args): string {
+    private function _getMessage(string $rule, string $attrib, string ...$args): string {
         if (isset($this->messages[$rule])) {
             $message = $this->messages[$rule];
 

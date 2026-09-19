@@ -5,7 +5,7 @@
  * @param array $keys The array of keys to convert.
  * @return string The comma-separated list of column names.
  */
-function createColumns(array $keys): string {
+function sqlColumns(array $keys): string {
     return implode(', ', $keys);
 }
 
@@ -15,8 +15,18 @@ function createColumns(array $keys): string {
  * @param array $keys The array of keys to convert.
  * @return string The comma-separated list of placeholders.
  */
-function createPlaceholders(array $keys): string {
+function sqlInsertParams(array $keys): string {
     return implode(', ', array_map(fn($key) => ":$key", $keys));
+}
+
+/**
+ * Convert an array of keys into a comma-separated list of update placeholders for SQL queries.
+ *
+ * @param array $keys The array of keys to convert.
+ * @return string The comma-separated list of update placeholders.
+ */
+function sqlUpdateParams(array $keys): string {
+    return implode(', ', array_map(fn($key) => "$key=:$key", $keys));
 }
 
 /**
@@ -25,7 +35,7 @@ function createPlaceholders(array $keys): string {
  * @param mixed $value The value to get the PDO data type for.
  * @return int The PDO data type constant.
  */
-function getDataType(mixed $value): int {
+function pdoDataType(mixed $value): int {
     static $types = [
         'boolean' => PDO::PARAM_BOOL,
         'integer' => PDO::PARAM_INT,

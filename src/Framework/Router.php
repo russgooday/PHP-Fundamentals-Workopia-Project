@@ -106,10 +106,10 @@ class Router {
      * @example routeMatch('/listings/:id', '.../listings/23') -> ['params'=>['id'=>'23']]
      */
     public function routeMatch(string $route, string $uri, string $rx='#^\{([^}]+)\}$#'): ?array {
-        $uri = $this->normalisePath(parse_url($uri, PHP_URL_PATH));
+        $uri = $this->_normalisePath(parse_url($uri, PHP_URL_PATH));
 
-        $route_parts = $this->splitPathToParts($route);
-        $uri_parts = $this->splitPathToParts($uri);
+        $route_parts = $this->_splitPathToParts($route);
+        $uri_parts = $this->_splitPathToParts($uri);
         $params = [];
 
         // early exit if a different number of parts
@@ -140,7 +140,7 @@ class Router {
      * @param string $path The path to split, e.g. '/listings/123/edit'.
      * @return array An array of path parts, e.g. ['listings', '123', 'edit'].
      */
-    private function splitPathToParts(string $path): array {
+    private function _splitPathToParts(string $path): array {
         return explode('/', trim($path, '/'));
     }
 
@@ -150,7 +150,7 @@ class Router {
      * @param string $path The path to normalise.
      * @return string A path that always begins with '/'.
      */
-    private function normalisePath(string $path): string {
+    private function _normalisePath(string $path): string {
         return '/' . trim($path, '/');
     }
 }

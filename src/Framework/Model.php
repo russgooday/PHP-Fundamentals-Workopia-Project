@@ -84,6 +84,39 @@ abstract class Model {
         return $stmt->fetch();
     }
 
+    /**
+     * Update a record in the model's table by its ID with the provided data.
+     *
+     * @param int $id The ID of the record to update.
+     * @param array $data The data to update the record with.
+     * @return bool True if the record was successfully updated, false otherwise.
+     */
+    public function update(int $id, array $data): bool {
+
+        if (!$data = $this->_getfillables($data)) {
+            return false;
+        }
+
+        $cols = array_keys($data);
+
+        $sql = "
+            UPDATE {$this->getTable()}
+            SET " . sqlUpdateParams($cols) . "
+            WHERE id = :id
+        ";
+
+        $stmt = $this->getConnection()->prepare($sql);
+
+        foreach ($data as $col => $val) {
+            $stmt->bindValue(":$col", $val, pdoDataType($val));
+        }
+
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->rowCount() > 0;
+    }
+
 
     /**
      * Create a new record in the model's table with the provided data.
@@ -92,31 +125,29 @@ abstract class Model {
      * @return bool True if the record was successfully created, false otherwise.
      */
     public function create(array $data): bool {
-        if (empty($data) || empty($this->fillable)) {
+
+        if (!$data = $this->_getfillables($data)) {
             return false;
         }
-
-        // if no allowed entries found then return false
-        if (!($data = filter_by_keys($data, $this->fillable))) {
-            return false;
-        };
 
         $cols = array_keys($data);
 
         $sql = "
             INSERT
-                INTO {$this->getTable()} (" . createColumns($cols) . ")
-                VALUES (" . createPlaceholders($cols) . ")
+                INTO {$this->getTable()} (" . sqlColumns($cols) . ")
+                VALUES (" . sqlInsertParams($cols) . ")
         ";
 
 
         $stmt = $this->getConnection()->prepare($sql);
 
         foreach ($data as $col => $val) {
-            $stmt->bindValue(":$col", $val, getDataType($val));
+            $stmt->bindValue(":$col", $val, pdoDataType($val));
         }
 
-        return $stmt->execute();
+        $stmt->execute();
+
+        return $stmt->rowCount() > 0;
     }
 
 
@@ -135,8 +166,22 @@ abstract class Model {
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-        // rowCount will give us a clear indication of whether
-        // we have successfully deleted an existing id
+
         return $stmt->rowCount() > 0;
+    }
+
+
+    /**
+     * Filter the provided data array to include only the fillable columns.
+     *
+     * @param array $data The data to filter.
+     * @return array|null The filtered data array, or null if no fillable columns are present.
+     */
+    private function _getfillables(array $data): ?array {
+        if (empty($data) || empty($this->fillable)) {
+            return null;
+        }
+
+        return filter_by_keys($data, $this->fillable) ?: null;
     }
 }

@@ -7,11 +7,12 @@ class PHPViewer implements ViewerInterface {
 
     protected array $globalData = [];
 
-    public function share(string $key, mixed $value): void {
+    public function share(string $key, mixed $value): self {
         $this->globalData[$key] = $value;
+        return $this;
     }
 
-    private function outputBufferView(string $__viewPath, array $data = []): string {
+    private function _outputBufferView(string $__viewPath, array $data = []): string {
         extract(array_merge($this->globalData, $data), EXTR_SKIP);
         unset($data);
 
@@ -34,7 +35,7 @@ class PHPViewer implements ViewerInterface {
 
         if (file_exists($view_path)) {
 
-            return $this->outputBufferView($view_path, $data);
+            return $this->_outputBufferView($view_path, $data);
         } else {
 
             logError("View file '{$view}' not found at: {$view_path}");
