@@ -121,7 +121,9 @@ class ListingsController extends Controller {
             $listing['user_id'] = 1; // temporary user ID for testing
 
             if ($this->listings->update($job_id, $listing)) {
-                $this->redirect('/listings');
+                // TODO: Offload to a Session class method for more declarative code
+                $_SESSION['flash'] = ['type' => 'success', 'message' => 'Listing successfully updated.'];
+                $this->redirect("/listings/{$job_id}");
             } else {
                 throw new HttpException(
                     500, 'Sorry, there was a problem updating the job listing', "/listings/{$job_id}/edit"
@@ -152,10 +154,7 @@ class ListingsController extends Controller {
      */
     public function delete(int $job_id): void {
         if ($this->listings->delete($job_id)) {
-            $_SESSION['flash'] = [
-                'type' => 'success',
-                'message' => 'Listing successfully deleted.'
-            ];
+            $_SESSION['flash'] = ['type' => 'success','message' => 'Listing successfully deleted.'];
             $this->redirect('/listings');
         } else {
             throw new HttpException(
