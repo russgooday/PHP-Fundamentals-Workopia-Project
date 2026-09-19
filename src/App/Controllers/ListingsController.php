@@ -54,6 +54,7 @@ class ListingsController extends Controller {
         echo $this->view('listings/create');
     }
 
+
     /**
      * Display the form to edit an existing job listing.
      *
@@ -67,6 +68,7 @@ class ListingsController extends Controller {
             throw new HttpException(404, 'Sorry, that job doesn\'t exist', '/listings');
         }
     }
+
 
     /**
      * Store a new job listing in the database.
@@ -99,10 +101,22 @@ class ListingsController extends Controller {
     }
 
 
+    /**
+     * Update an existing job listing in the database.
+     *
+     * @param int $job_id
+     * @return void
+     */
     public function update(int $job_id): void {
+
+        if (!$this->listings->findOne($job_id)) {
+            throw new HttpException(404, "Sorry, that job doesn't exist", '/listings');
+        }
+
         $formRequest = $this->formRequest;
 
         if ($formRequest->validate()) {
+
             $listing = $formRequest->sanitized();
             $listing['user_id'] = 1; // temporary user ID for testing
 
@@ -113,14 +127,17 @@ class ListingsController extends Controller {
                     500, 'Sorry, there was a problem updating the job listing', "/listings/{$job_id}/edit"
                 );
             }
+
         } else {
-            $request = $formRequest->getRequest();
+
+            $post_data = $formRequest->getRequest()->post;
+            $errors = $formRequest->getErrors();
 
             echo $this->view(
                 'listings/create',
                 [
-                    'errors' => $formRequest->getErrors(),
-                    'job' => (object)[...$request->post, 'id' => $job_id]
+                    'errors' => $errors,
+                    'job' => (object)[...$post_data, 'id' => $job_id]
                 ]
             );
         }

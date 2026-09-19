@@ -61,14 +61,14 @@ function findOneOf(array $needles, array $haystack, mixed $default = null): mixe
  * @return array The filtered array containing only the allowed key-value pairs.
  */
 function filter_by_keys(array $arr, array $keys): array {
-    $allowed = [];
+    $filtered = [];
     $flipped = array_flip($keys);
 
     foreach($arr as $key => $val) {
         if (isset($flipped[$key])) {
-            $allowed[$key] = $val;
+            $filtered[$key] = $val;
         }
     }
 
-    return $allowed;
+    return $filtered;
 }
