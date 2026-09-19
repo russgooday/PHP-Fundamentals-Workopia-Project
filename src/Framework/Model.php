@@ -84,39 +84,6 @@ abstract class Model {
         return $stmt->fetch();
     }
 
-    /**
-     * Update a record in the model's table by its ID with the provided data.
-     *
-     * @param int $id The ID of the record to update.
-     * @param array $data The data to update the record with.
-     * @return bool True if the record was successfully updated, false otherwise.
-     */
-    public function update(int $id, array $data): bool {
-
-        if (!$data = $this->_getfillables($data)) {
-            return false;
-        }
-
-        $cols = array_keys($data);
-
-        $sql = "
-            UPDATE {$this->getTable()}
-            SET " . sqlUpdateParams($cols) . "
-            WHERE id = :id
-        ";
-
-        $stmt = $this->getConnection()->prepare($sql);
-
-        foreach ($data as $col => $val) {
-            $stmt->bindValue(":$col", $val, pdoDataType($val));
-        }
-
-        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
-        $stmt->execute();
-
-        return $stmt->rowCount() > 0;
-    }
-
 
     /**
      * Create a new record in the model's table with the provided data.
@@ -145,6 +112,40 @@ abstract class Model {
             $stmt->bindValue(":$col", $val, pdoDataType($val));
         }
 
+        $stmt->execute();
+
+        return $stmt->rowCount() > 0;
+    }
+
+
+    /**
+     * Update a record in the model's table by its ID with the provided data.
+     *
+     * @param int $id The ID of the record to update.
+     * @param array $data The data to update the record with.
+     * @return bool True if the record was successfully updated, false otherwise.
+     */
+    public function update(int $id, array $data): bool {
+
+        if (!$data = $this->_getfillables($data)) {
+            return false;
+        }
+
+        $cols = array_keys($data);
+
+        $sql = "
+            UPDATE {$this->getTable()}
+            SET " . sqlUpdateParams($cols) . "
+            WHERE id = :id
+        ";
+
+        $stmt = $this->getConnection()->prepare($sql);
+
+        foreach ($data as $col => $val) {
+            $stmt->bindValue(":$col", $val, pdoDataType($val));
+        }
+
+        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->rowCount() > 0;
