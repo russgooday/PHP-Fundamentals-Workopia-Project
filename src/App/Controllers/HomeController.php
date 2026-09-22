@@ -3,6 +3,7 @@ namespace App\Controllers;
 
 use Framework\Exceptions\HttpException,
     Framework\Controller,
+    Framework\Response,
     App\Models\Listings;
 
 class HomeController extends Controller {
@@ -11,15 +12,15 @@ class HomeController extends Controller {
         protected Listings $listings
     ) {}
 
-    public function index(): void {
-        if ($output = $this->viewer->render('home',
+    public function index(): Response {
+        if ($response = $this->view('home',
             [
                 'title' => 'Home',
                 'listings' => $this->listings->findAll(6),
                 // 'search' => $_GET['search'] ?? null
             ]
         )) {
-            echo $output;
+            return $response;
         } else {
             throw new HttpException(404, 'Page not found');
         }

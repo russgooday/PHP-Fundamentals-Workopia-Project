@@ -1,7 +1,7 @@
 <?php
 namespace Framework;
-use App\Config\Paths;
-use Throwable;
+
+use App\Config\Paths, Throwable;
 
 class PHPViewer implements ViewerInterface {
 
@@ -15,7 +15,6 @@ class PHPViewer implements ViewerInterface {
     private function _outputBufferView(string $__viewPath, array $data = []): string {
         extract(array_merge($this->globalData, $data), EXTR_SKIP);
         unset($data);
-
         ob_start();
 
         try {

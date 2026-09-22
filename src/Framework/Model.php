@@ -146,9 +146,8 @@ abstract class Model {
         }
 
         $stmt->bindValue(":id", $id, PDO::PARAM_INT);
-        $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+        return $stmt->execute();
     }
 
 

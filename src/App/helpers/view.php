@@ -32,3 +32,16 @@ function toDollars(int|float $amount, int $precision = 0): string {
 function joinStrings(callable $callback, array $array, string $separator = "\n"): string {
     return implode($separator, array_map($callback, $array));
 }
+
+/**
+ * Retrieve a message from the session by its key.
+ * @param string $key The key of the message to retrieve.
+ * @param string|null $default The default value to return if the message is not found.
+ * @return string|null The message value or the default value if not found.
+ */
+function getMessage(string $key, ?string $default = null) {
+    if (isset($_SESSION['messages'])) {
+        return $_SESSION['messages'][$key] ?? $default;
+    }
+    return $default;
+}

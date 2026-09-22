@@ -12,7 +12,7 @@ class Dispatcher {
         private Container $container
     ){}
 
-    public function dispatch(Request $request): void {
+    public function dispatch(Request $request): Response {
         // get the controller and route parameters from the router
         if (!$routeData = $this->router->match($request->uri, $request->method())) {
             http_response_code(404);
@@ -26,27 +26,26 @@ class Dispatcher {
         $controller_class = $this->getController($controller);
 
         // set the viewer for the controller
-        $controller_class->setViewer($this->container->resolve(ViewerInterface::class));
+        // $controller_class->setViewer($this->container->resolve(ViewerInterface::class));
+
+        // set the response for the controller
+        $controller_class->setResponse($this->container->resolve(Response::class));
 
         // get the required controller method arguments from the route parameters
         $args = $this->getMethodArguments($controller_class, $action, $routeData['params']);
 
-        $controller_class->$action(...$args);
+        return $controller_class->$action(...$args);
     }
 
 
     /**
-     * Gets the controller class from the container and sets the viewer.
+     * Gets the controller class from the container.
      *
      * @param string $controllerClass The fully qualified class name of the controller.
-     * @return object The controller instance with the viewer set.
+     * @return object The controller instance.
      */
     function getController(string $controllerClass): object {
-        $container = $this->container;
-
-        return $container
-            ->resolve($controllerClass)
-            ->setViewer($container->resolve(ViewerInterface::class));
+        return $this->container->resolve($controllerClass);
     }
 
     /**

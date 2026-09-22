@@ -1,8 +1,8 @@
 <?php
 namespace App\Controllers;
 
-use Framework\Controller;
-use App\Config\HttpErrorMessages;
+use Framework\Controller,
+    App\Config\HttpErrorMessages;
 
 class ErrorController extends Controller {
 
@@ -16,8 +16,8 @@ class ErrorController extends Controller {
         ?string $return_url = null
     ): void {
         $error_message = $this->messages->fetchError($status_code, $message, $return_url);
-        http_response_code($error_message['status_code']);
 
-        echo $this->viewer->render('error', $error_message);
+        // http_response_code($error_message['status_code']);
+        echo $this->viewer()->render('error', $error_message);
     }
 }

@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 require_once '../src/App/functions.php';
 require_once '../autoloader.php';
 
@@ -9,29 +7,42 @@ $auto_loader = (new Autoloader())
     ->addNamespace('Framework\\', 'src/Framework/')
     ->register();
 
-use Framework\Container,
-    Framework\Router,
-    Framework\Dispatcher,
-    Framework\Request,
-    Framework\ErrorHandler,
-    App\Config\Services,
-    App\Config\Routes;
+use Framework\{
+    Container,
+    Router,
+    Dispatcher,
+    PHPViewer,
+    Controller,
+    Request,
+    ErrorHandler,
+    Session
+};
+
+use App\Config\{Services, Routes};
+
+// set the default viewer for controllers
+Controller::setDefaultViewer(new PHPViewer);
 
 $request = new Request;
 
+// register the routes
 $router = Routes::register(new Router);
 
+// register the services container
 $container = Services::register(new Container, $request);
 
-$error_handler = new ErrorHandler($container);
+// resolve the error handler from the container
+$error_handler = $container->resolve(ErrorHandler::class);
 
+// set the global error and exception handlers
 set_exception_handler([$error_handler, 'handleException']);
 set_error_handler([$error_handler, 'handleError']);
 
+Session::start();
+
 $dispatcher = new Dispatcher($router, $container);
+$response = $dispatcher->dispatch($request);
 
-$dispatcher->dispatch(new Request);
+Session::storeNewMessages();
 
-set_error_handler(function (int $severity, string $message, string $file, int $line): void {
-    logError("Error: {$message} in {$file} on line {$line}");
-});
+$response->send();
