@@ -4,25 +4,27 @@ namespace Framework;
 use App\Controllers\ErrorController,
     Framework\Exceptions\HttpException;
 
+error_reporting(E_ALL);
+
 class ErrorHandler {
     public function __construct(protected ErrorController $error_controller) {}
 
     public function handleException(\Throwable $e): void {
         $error_ctrl = $this->error_controller;
 
-        $file = basename($e->getFile());
-        $message = "{$e->getMessage()} in {$file} on line {$e->getLine()}";
+        $message = $e->getMessage();
+        $log_msg = "$message in {$e->getFile()} on line {$e->getLine()}";
 
         if ($e instanceof HttpException) {
-            logError("HTTP Exception: " . $e->getMessage());
+            logError("HTTP Exception: $log_msg");
             $error_ctrl->index($e->getCode(), $message, $e->getReturnUrl());
         } else if ($e instanceof \PDOException) {
 
-            logError("A database error occurred: " . $e->getMessage());
+            logError("A database error occurred: $log_msg");
             $error_ctrl->index($e->getCode(), $message);
         } else {
 
-            logError("Fatal Core Failure: {$e->getMessage()} in {$e->getFile()} on line {$e->getLine()}");
+            logError("Fatal Core Failure: $log_msg");
             $error_ctrl->index($e->getCode(), $message);
         }
     }

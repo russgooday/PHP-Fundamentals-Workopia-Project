@@ -1,10 +1,9 @@
 <?php
 namespace App\Controllers;
 
-use Framework\Exceptions\HttpException,
-    Framework\Controller,
-    Framework\Response,
-    App\Models\Listings;
+use Framework\Exceptions\HttpException;
+use Framework\{Controller, Response};
+use App\Models\Listings;
 
 class HomeController extends Controller {
 

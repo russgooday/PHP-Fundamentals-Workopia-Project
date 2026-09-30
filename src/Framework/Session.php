@@ -1,14 +1,11 @@
 <?php
-// Note: Opting for static methods instead of instance methods for session management,
-// because of the need for easily accessible session management throughout the application.
-
 namespace Framework;
 
 class Session {
 
-    static private array $new_messages = [];
+    private array $new_messages = [];
 
-    static public function start() {
+    public function start() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
@@ -22,42 +19,45 @@ class Session {
         }
     }
 
-    static public function get(string $key, mixed $default = null): mixed {
+    public function get(string $key, mixed $default = null): mixed {
         if (array_key_exists($key, $_SESSION['data'])) {
             return $_SESSION['data'][$key];
         }
         return $default;
     }
 
-    static public function set(string $key, mixed $value): void {
+    public function set(string $key, mixed $value): void {
         $_SESSION['data'][$key] = $value;
     }
 
-    static public function remove(string $key): void {
+    public function remove(string $key): void {
         unset($_SESSION['data'][$key]);
     }
 
-
-    static public function getMessage(string $key): mixed {
+    public function getMessage(string $key): mixed {
         return $_SESSION['messages'][$key] ?? null;
     }
 
-    static public function setMessage(string $key, mixed $value): void {
+    public function getMessages(): ?array {
+        return $_SESSION['messages'];
+    }
+
+    public function setMessage(string $key, mixed $value): void {
         // setting next request message
-        self::$new_messages[$key] = $value;
+        $this->new_messages[$key] = $value;
     }
 
-    static public function storeNewMessages(): void {
+    public function storeNewMessages(): void {
         // call at end of request to store new messages
-        $_SESSION['messages'] = self::$new_messages;
-        self::$new_messages = []; // reset new_messages
+        $_SESSION['messages'] = $this->new_messages;
+        $this->new_messages = []; // reset new_messages
     }
 
-    static public function regenerateId(): void {
+    public function regenerateId(): void {
         session_regenerate_id(true);
     }
 
-    static public function destroy(): void {
+    public function destroy(): void {
         $_SESSION = [];
 
         if (session_status() === PHP_SESSION_ACTIVE) {
@@ -73,8 +73,8 @@ class Session {
      * @param string $message The success message.
      * @param string $key The key under which the message will be stored in the session. Default is 'message'.
      */
-    static public function success(string $message, string $key = 'message'): void {
-        self::setMessage($key, [
+    public function success(string $message, string $key = 'message'): void {
+        $this->setMessage($key, [
             'type' => 'success',
             'message' => $message
         ]);
@@ -86,10 +86,28 @@ class Session {
      * @param string $message The error message.
      * @param string $key The key under which the message will be stored in the session. Default is 'message'.
      */
-    static public function error(string $message, string $key = 'message'): void {
-        self::setMessage($key, [
+    public function error(string $message, string $key = 'message'): void {
+        $this->setMessage($key, [
             'type' => 'error',
             'message' => $message
         ]);
+    }
+}
+
+/**
+ * A proxy class for the Session that exposes only the allowed methods.
+ * Hiding potentially destructive methods of the Session like 'destroy'.
+ */
+class SharedSessionProxy {
+    public function __construct(private Session $session) {}
+
+    // Expose only the allowed methods
+
+    public function getMessage(string $key): mixed {
+        return $this->session->getMessage($key);
+    }
+
+    public function getMessages(): ?array {
+        return $this->session->getMessages();
     }
 }

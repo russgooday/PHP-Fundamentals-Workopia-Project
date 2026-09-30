@@ -8,41 +8,38 @@ $auto_loader = (new Autoloader())
     ->register();
 
 use Framework\{
-    Container,
     Router,
     Dispatcher,
-    PHPViewer,
-    Controller,
     Request,
     ErrorHandler,
     Session
 };
 
+use Framework\Container\Container;
+
 use App\Config\{Services, Routes};
 
-// set the default viewer for controllers
-Controller::setDefaultViewer(new PHPViewer);
+// register the services container
+$container = Services::register(new Container);
 
-$request = new Request;
+// curry the error handler for lazy evaluation
+$error_handler = curryN(2, fn($method, ...$args) =>
+    $container[ErrorHandler::class]->$method(...$args)
+);
+
+// pass in the appropriate methods to the error handler ready for use
+set_exception_handler($error_handler('handleException'));
+set_error_handler($error_handler('handleError'));
 
 // register the routes
 $router = Routes::register(new Router);
 
-// register the services container
-$container = Services::register(new Container, $request);
-
-// resolve the error handler from the container
-$error_handler = $container->resolve(ErrorHandler::class);
-
-// set the global error and exception handlers
-set_exception_handler([$error_handler, 'handleException']);
-set_error_handler([$error_handler, 'handleError']);
-
-Session::start();
+$session = $container->resolve(Session::class);
+$session->start();
 
 $dispatcher = new Dispatcher($router, $container);
-$response = $dispatcher->dispatch($request);
+$response = $dispatcher->dispatch(new Request);
 
-Session::storeNewMessages();
+$session->storeNewMessages();
 
 $response->send();

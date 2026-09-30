@@ -23,23 +23,13 @@ class PHPViewer implements ViewerInterface {
             return ob_get_clean();
         } catch (Throwable $e) {
             ob_end_clean();
-            logError("Error rendering view: {$e->getMessage()}");
-            return '';
+            throw $e;
         }
     }
 
 
-    public function render(string $view, array $data = []): ?string {
-        $view_path = Paths::VIEWS . "/$view.view.php";
-
-        if (file_exists($view_path)) {
-
-            return $this->_outputBufferView($view_path, $data);
-        } else {
-
-            logError("View file '{$view}' not found at: {$view_path}");
-            return null;
-        }
+    public function render(string $view, array $data = []): string {
+        return $this->_outputBufferView(Paths::VIEWS . "/$view.view.php", $data);
     }
 
 

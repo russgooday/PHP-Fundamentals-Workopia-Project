@@ -2,16 +2,20 @@
 
 namespace Framework\Exceptions;
 
+/**
+ * Class HttpException
+ * @package Framework\Exceptions
+ * HTTP exception class that includes a return URL for redirection.
+ * see https://www.php.net/manual/en/class.exception.php
+ */
 class HttpException extends \Exception {
-    protected string $return_url;
 
     public function __construct(
-        int $status_code,
-        string $message,
-        ?string $return_url = null
+        protected $code = 0,
+        protected $message = '',
+        protected $return_url = '/'
     ) {
-        parent::__construct($message, $status_code);
-        $this->return_url = $return_url ?: '/';
+        parent::__construct($message, $code);
     }
 
     public function getReturnUrl(): string {

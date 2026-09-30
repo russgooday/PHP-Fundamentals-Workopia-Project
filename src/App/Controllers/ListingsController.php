@@ -5,6 +5,7 @@ use Framework\Exceptions\HttpException,
     Framework\Controller,
     Framework\Response,
     Framework\Session,
+
     App\FormRequests\ListingsFormRequest,
     App\Models\Listings;
 
@@ -25,7 +26,11 @@ class ListingsController extends Controller {
     public function index(): Response {
         if ($listings = $this->listings->findAll()) {
             return $this->view(
-                'listings/index', ['title' => 'Listings', 'listings' => $listings]
+                'listings/index',
+                [
+                    'title' => 'Listings',
+                    'listings' => $listings
+                ]
             );
         } else {
             throw new HttpException(404, 'Sorry, no jobs found');

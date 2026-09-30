@@ -1,6 +1,9 @@
 <?php
 namespace Framework;
 
+use Framework\Container\Container;
+use Framework\Exceptions\HttpException;
+
 use ReflectionMethod;
 
 class Dispatcher {
@@ -15,8 +18,7 @@ class Dispatcher {
     public function dispatch(Request $request): Response {
         // get the controller and route parameters from the router
         if (!$routeData = $this->router->match($request->uri, $request->method())) {
-            http_response_code(404);
-            $routeData = $this->router->match('/error/404');
+            throw new HttpException(404);
         }
 
         // get the action from the controller string
@@ -25,15 +27,9 @@ class Dispatcher {
         // get the controller class and resolve its dependencies
         $controller_class = $this->getController($controller);
 
-        // set the viewer for the controller
-        // $controller_class->setViewer($this->container->resolve(ViewerInterface::class));
-
-        // set the response for the controller
-        $controller_class->setResponse($this->container->resolve(Response::class));
-
         // get the required controller method arguments from the route parameters
         $args = $this->getMethodArguments($controller_class, $action, $routeData['params']);
-
+        // inspectAndDie($action);
         return $controller_class->$action(...$args);
     }
 
@@ -74,6 +70,7 @@ class Dispatcher {
      * @return array An array of arguments to pass to the controller method.
      */
     protected function getMethodArguments(Controller $controller, string $method, array $uri_params): array {
+        // TODO: Consider moving method to Container class
         $reflection = new ReflectionMethod($controller, $method);
 
         return array_map(

@@ -7,7 +7,7 @@
 
     <section class="container mx-auto p-4 mt-4">
         <div class="rounded-lg shadow-md bg-white p-3">
-            <?= $this->render('partials/message', ['message' => Session::getMessage('message')]); ?>
+            <?= $this->render('partials/message', ['message' => $session->getMessage('message')]); ?>
             <div class="flex justify-between items-center">
                 <a class="block p-4 text-blue-700" href="/listings">
                     <i class="fa fa-arrow-alt-circle-left"></i>
