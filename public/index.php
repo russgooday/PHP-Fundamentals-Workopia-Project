@@ -1,5 +1,6 @@
 <?php
-require_once '../src/App/functions.php';
+require_once '../src/App/helpers.php';
+require_once '../src/Framework/functions.php';
 require_once '../autoloader.php';
 
 $auto_loader = (new Autoloader())
