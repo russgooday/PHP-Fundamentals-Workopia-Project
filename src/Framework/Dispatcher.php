@@ -4,8 +4,6 @@ namespace Framework;
 use Framework\Container\Container;
 use Framework\Exceptions\HttpException;
 
-use ReflectionMethod;
-
 class Dispatcher {
 
     protected string $namespace = 'App\\Controllers\\';
@@ -28,7 +26,7 @@ class Dispatcher {
         $controller_class = $this->getController($controller);
 
         // get the required controller method arguments from the route parameters
-        $args = $this->getMethodArguments($controller_class, $action, $routeData['params']);
+        $args = $this->container->getMethodArguments($controller_class, $action, $routeData['params']);
         // inspectAndDie($action);
         return $controller_class->$action(...$args);
     }
@@ -41,7 +39,7 @@ class Dispatcher {
      * @return object The controller instance.
      */
     function getController(string $controllerClass): object {
-        return $this->container->resolve($controllerClass);
+        return $this->container->get($controllerClass);
     }
 
     /**
@@ -58,50 +56,5 @@ class Dispatcher {
         }
 
         return [ $this->namespace . $controller, $action ?? 'index' ];
-    }
-
-    /**
-     * Gets the parameter names from the controller method and uses them
-     * to pick out the required arguments from the route params array.
-     *
-     * @param Controller $controller The controller instance.
-     * @param string $method The name of the method to inspect.
-     * @param array $uri_params The route parameters to match against.
-     * @return array An array of arguments to pass to the controller method.
-     */
-    protected function getMethodArguments(Controller $controller, string $method, array $uri_params): array {
-        // TODO: Consider moving method to Container class
-        $reflection = new ReflectionMethod($controller, $method);
-
-        return array_map(
-            fn($param) => $this->getParamValue($param, $uri_params),
-            $reflection->getParameters()
-        );
-    }
-
-    /**
-     * Gets the value for a given parameter from the route parameters.
-     *
-     * @param \ReflectionParameter $param The parameter to get the value for.
-     * @param array $uri_params The route parameters to match against.
-     * @return mixed The value for the parameter.
-     * @throws \InvalidArgumentException If the parameter is required but not provided.
-     */
-    protected function getParamValue(\ReflectionParameter $param, array $uri_params) {
-        $name = $param->getName();
-        // have a match in the route parameters
-        if (isset($uri_params[$name])) {
-            return castTo($param->getType(), $uri_params[$name]);
-
-        // or has a default value for the parameter
-        } elseif ($param->isDefaultValueAvailable()) {
-            return $param->getDefaultValue();
-
-        // or is nullable
-        } elseif ($param->allowsNull()) {
-            return null;
-        }
-
-        throw new \InvalidArgumentException("Missing required parameter '{$name}'.");
     }
 }

@@ -35,7 +35,7 @@ set_error_handler($error_handler('handleError'));
 // register the routes
 $router = Routes::register(new Router);
 
-$session = $container->resolve(Session::class);
+$session = $container->get(Session::class);
 $session->start();
 
 $dispatcher = new Dispatcher($router, $container);

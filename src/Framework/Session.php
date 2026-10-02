@@ -93,21 +93,3 @@ class Session {
         ]);
     }
 }
-
-/**
- * A proxy class for the Session that exposes only the allowed methods.
- * Hiding potentially destructive methods of the Session like 'destroy'.
- */
-class SharedSessionProxy {
-    public function __construct(private Session $session) {}
-
-    // Expose only the allowed methods
-
-    public function getMessage(string $key): mixed {
-        return $this->session->getMessage($key);
-    }
-
-    public function getMessages(): ?array {
-        return $this->session->getMessages();
-    }
-}

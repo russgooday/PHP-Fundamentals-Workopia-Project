@@ -1,6 +1,13 @@
 <?php
 namespace App\Config;
-use Framework\{Response, Database, Controller, Session, SharedSessionProxy, ViewerInterface, PHPViewer};
+use Framework\{
+    Response,
+    Database,
+    Controller,
+    Session,
+    ViewerInterface,
+    PHPViewer
+};
 use Framework\Container\Container;
 use Framework\Validation\MessageLoader;
 
@@ -35,9 +42,7 @@ class Services {
                 ViewerInterface::class,
 
                 function($viewer, $container) {
-                    $viewer->share(
-                        'session', new SharedSessionProxy($container[Session::class])
-                    );
+                    $viewer->share('session', $container[Session::class]);
                 }
             );
 

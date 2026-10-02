@@ -23,13 +23,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 4. `Session` is started, `Dispatcher::dispatch(Request)` matches the route, resolves the controller (namespace `App\Controllers\`) from the container, maps route params onto action method arguments via reflection, and returns a `Response`.
 5. `Session::storeNewMessages()` runs, then `Response::send()`.
 
-**Container** (`src/Framework/Container/`): autowiring DI container with `singleton`/binding support, array access (`$container[Foo::class]`), and Laravel-style `afterResolving(Type, fn($obj, $container))` hooks (`EventManager`). `Services.php` uses these hooks for uniform post-construction wiring: controllers get `setResponse`/`setViewer`, and every `ViewerInterface` gets a shared `session` variable (`SharedSessionProxy`). Design notes are in `notes/`.
+**Container** (`src/Framework/Container/`): autowiring DI container with `singleton`/binding support, array access (`$container[Foo::class]`), and Laravel-style `afterResolving(Type, fn($obj, $container))` hooks (`EventManager`). `Services.php` uses these hooks for uniform post-construction wiring: controllers get `setResponse`/`setViewer`, and every `ViewerInterface` gets a shared `session` variable (the `Session` itself). Design notes are in `notes/`.
 
 **Controllers** extend `Framework\Controller`, which exposes `view()`, `redirect()`, `addHeader()` returning a `Response`. Routes are declared as `'ControllerName@action'` strings in `src/App/Config/routes.php` (no `@` means the default action, e.g. `index`). Views live in `src/App/views/` (`*.view.php`, partials in `views/partials/`) and are rendered by `PHPViewer` behind `ViewerInterface`. Sanitize at view render time, not at storage.
 
 **Models / validation:** `Framework\Model` wraps PDO via `Database`. `FormRequest` (e.g. `App\FormRequests\ListingsFormRequest`) uses `Validation\Validator`, with `ValidatorChecks` and `MessageLoader` (default messages in `Validation/messages.php`).
 
-**Sessions / flash messages:** age-based (not access-based) flash messages in `Session`; new messages are stored at the end of the request and shared into views through `SharedSessionProxy`.
+**Sessions / flash messages:** age-based (not access-based) flash messages in `Session`; new messages are stored at the end of the request and shared into views as the `session` variable (the `Session` object is passed directly, no proxy).
 
 **Errors:** `ErrorHandler` and `HttpException` handle failures; the error path is deliberately separate from the normal `Response` flow. Do not add view-existence checks: missing view files should bubble up to the global handler.
 

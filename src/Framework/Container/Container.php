@@ -2,13 +2,17 @@
 
 namespace Framework\Container;
 
-use InvalidArgumentException;
-use ReflectionClass;
-use ArrayAccess;
+use InvalidArgumentException,
+    ReflectionClass,
+    ReflectionMethod,
+    ReflectionParameter,
+    ReflectionNamedType,
+    ArrayAccess;
+
 
 class Container implements ArrayAccess {
-    private array $bindings = [];
 
+    private array $bindings = [];
     private array $instances = [];
 
     public function __construct(
@@ -31,7 +35,7 @@ class Container implements ArrayAccess {
         return $this;
     }
 
-    public function resolve(string $class_name) {
+    public function get(string $class_name) {
 
         if (isset($this->instances[$class_name])) {
 
@@ -44,9 +48,14 @@ class Container implements ArrayAccess {
 
         } else {
             // recursively resolve constructor dependencies
-
             $reflectionClass = new ReflectionClass($class_name);
             $args = [];
+
+            if (!$reflectionClass->isInstantiable()) {
+                throw new InvalidArgumentException(
+                    "{$class_name} is not instantiable and has no binding."
+                );
+            }
 
             if ($params = $reflectionClass->getConstructor()?->getParameters()) {
 
@@ -59,7 +68,7 @@ class Container implements ArrayAccess {
                         );
                     }
 
-                    $args[] = $this->resolve((string) $type);
+                    $args[] = $this->get((string) $type);
                 }
             }
 
@@ -78,17 +87,71 @@ class Container implements ArrayAccess {
         return $instance;
     }
 
-    // ArrayAccess methods
 
-    public function offsetExists(mixed $key): bool {
+    public function has(string $class_name) {
         return (
-            isset($this->bindings[$key]) ||
-            isset($this->instances[$key])
+            isset($this->bindings[$class_name]) ||
+            isset($this->instances[$class_name])
         );
     }
 
+    /**
+     * Gets the parameter names from the controller method and uses them
+     * to pick out the required arguments from the route params array.
+     *
+     * @param object $object The method's instance.
+     * @param string $method_name The name of the method to inspect.
+     * @param array $params The parameters to match against.
+     * @return array An array of arguments to pass to the controller method.
+     */
+    public function getMethodArguments(object $object, string $method_name, array $params): array {
+        $reflection = new ReflectionMethod($object, $method_name);
+
+        return array_map(
+            fn($param) => $this->getParamValue($param, $params),
+            $reflection->getParameters()
+        );
+    }
+
+    /**
+     * Gets the value for a given parameter from the route parameters.
+     *
+     * @param ReflectionParameter $param The parameter to get the value for.
+     * @param array $params The parameters to match against.
+     * @return mixed The value for the parameter.
+     * @throws InvalidArgumentException If the parameter is required but not provided.
+     */
+    public function getParamValue(ReflectionParameter $param, array $params) {
+        $name = $param->getName();
+        $type = $param->getType();
+
+        // have a match in the route parameters
+        if (array_key_exists($name, $params)) {
+            return castTo($type, $params[$name]);
+
+        // or has a default value for the parameter
+        } elseif ($param->isDefaultValueAvailable()) {
+            return $param->getDefaultValue();
+
+        } elseif ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
+            return $this->get($type->getName()::class);
+
+        // or is nullable
+        } elseif ($param->allowsNull()) {
+            return null;
+        }
+
+        throw new InvalidArgumentException("Missing required parameter '{$name}'.");
+    }
+
+    // ArrayAccess methods
+
+    public function offsetExists(mixed $key): bool {
+        return $this->has($key);
+    }
+
     public function offsetGet(mixed $key): mixed {
-        return $this->resolve($key);
+        return $this->get($key);
     }
 
     public function offsetSet(mixed $key, mixed $value): void {
