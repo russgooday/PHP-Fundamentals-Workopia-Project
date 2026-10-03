@@ -29,7 +29,13 @@ class PHPViewer implements ViewerInterface {
 
 
     public function render(string $view, array $data = []): string {
-        return $this->_outputBufferView(Paths::VIEWS . "/$view.view.php", $data);
+        $path = Paths::VIEWS . "/$view.view.php";
+
+        if (!is_file($path)) {
+            throw new Exceptions\ViewNotFoundException("View '{$view}' not found.");
+        }
+
+        return $this->_outputBufferView($path, $data);
     }
 
 
@@ -37,7 +43,7 @@ class PHPViewer implements ViewerInterface {
         $output = '';
 
         foreach ($data as $item) {
-            $output .= $this->render($view, [$name => $item]) ?? '';
+            $output .= $this->render($view, [$name => $item]);
         }
 
         return $output;

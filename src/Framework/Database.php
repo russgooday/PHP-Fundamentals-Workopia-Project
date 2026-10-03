@@ -19,23 +19,16 @@ class Database {
         if (is_null($this->pdo)) {
             $dsn = "mysql:host={$this->host};port=3306;dbname={$this->dbname};charset=utf8";
 
-            try {
-
-                $this->pdo = new PDO(
-                    $dsn,
-                    $this->user,
-                    $this->password,
-                    [
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
-                        Mysql::ATTR_INIT_COMMAND => "SET sql_mode='STRICT_TRANS_TABLES'"
-                    ]
-                );
-            } catch (PDOException $err) {
-
-                logError("Database connection failed: " . $err->getMessage());
-                die("Database connection failed.");
-            }
+            $this->pdo = new PDO(
+                $dsn,
+                $this->user,
+                $this->password,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_OBJ,
+                    Mysql::ATTR_INIT_COMMAND => "SET sql_mode='STRICT_TRANS_TABLES'"
+                ]
+            );
         }
 
         return $this->pdo;

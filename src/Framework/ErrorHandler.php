@@ -13,19 +13,12 @@ class ErrorHandler {
         $error_ctrl = $this->error_controller;
 
         $message = $e->getMessage();
-        $log_msg = "$message in {$e->getFile()} on line {$e->getLine()}";
+        logError($e);
 
         if ($e instanceof HttpException) {
-            logError("HTTP Exception: $log_msg");
             $error_ctrl->index($e->getCode(), $message, $e->getReturnUrl());
-        } else if ($e instanceof \PDOException) {
-
-            logError("A database error occurred: $log_msg");
-            $error_ctrl->index($e->getCode(), $message);
         } else {
-
-            logError("Fatal Core Failure: $log_msg");
-            $error_ctrl->index($e->getCode(), $message);
+            $error_ctrl->index(500);
         }
     }
 

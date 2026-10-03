@@ -126,6 +126,10 @@ class Validator {
      *
      * @param array $rules The rule strings for an attribute.
      * @return array The reordered rule strings.
+     *
+     * @example with primary rules ['required', 'string', 'numeric']
+     * _sortRules(['min:3', 'string', 'required', 'max:10'])
+     * returns ['required', 'string', 'min:3', 'max:10']
      */
     private function _sortRules(array $rules) {
         $primary_rules = $this->primary_rules;

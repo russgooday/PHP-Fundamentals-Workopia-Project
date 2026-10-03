@@ -40,3 +40,15 @@ function toFloat(?string $value): ?float {
 
     return $result === false ? null : (float) $result;
 }
+
+/**
+ * Checks if the given type is a single named type.
+ * Excludes union types, intersection types, and null.
+ * @param mixed $type The type to check.
+ * @return bool True if the type is a single named type, false otherwise.
+ *
+ * @phpstan-assert-if-true \ReflectionNamedType $type
+ */
+function isSingleType(mixed $type): bool {
+    return $type instanceof ReflectionNamedType;
+}

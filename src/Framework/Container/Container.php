@@ -30,54 +30,64 @@ class Container implements ArrayAccess {
         return $this;
     }
 
-    public function afterResolving(string $class_name, callable $handler): static {
-        $this->events->on('afterResolving', $class_name, $handler);
+    // Register a callback to be executed after a specific service is resolved.
+    public function afterResolving(string $name, callable $handler): static {
+        $this->events->on('afterResolving', $name, $handler);
         return $this;
     }
 
-    public function get(string $class_name) {
+    /**
+     * Resolve an instance by class or interface name.
+     * Returns a cached shared instance if one exists, otherwise uses the registered
+     * binding, or autowires the class by recursively resolving its constructor
+     * dependencies. Afterwards, any afterResolving handlers are dispatched.
+     *
+     * @param string $name The class or interface name to resolve.
+     * @return object The resolved instance.
+     * @throws InvalidArgumentException If the name has no binding and is not instantiable,
+     * or a constructor parameter has no resolvable type.
+     */
+    public function get(string $name): object {
 
-        if (isset($this->instances[$class_name])) {
+        if (isset($this->instances[$name])) {
 
-            return $this->instances[$class_name];
+            return $this->instances[$name];
         }
 
-        if ($binding = $this->bindings[$class_name] ?? null) {
+        if ($binding = $this->bindings[$name] ?? null) {
 
             $instance = $binding->resolve($this);
 
         } else {
             // recursively resolve constructor dependencies
-            $reflectionClass = new ReflectionClass($class_name);
+            $reflectionClass = new ReflectionClass($name);
             $args = [];
 
             if (!$reflectionClass->isInstantiable()) {
-                throw new InvalidArgumentException(
-                    "{$class_name} is not instantiable and has no binding."
-                );
+                throw new InvalidArgumentException("{$name} is not instantiable and has no binding.");
             }
 
             if ($params = $reflectionClass->getConstructor()?->getParameters()) {
 
                 foreach ($params as $param) {
-                    $type = $param->getType();
+                    if ($param_name = $this->getResolvable($param)) {
 
-                    if (is_null($type) or $type->isBuiltin()) {
+                        $args[] = $this->get($param_name);
+                    } else {
+
                         throw new InvalidArgumentException(
-                            "Unable to resolve {$class_name}'s constructor '$type' parameter '{$param->getName()}' "
+                            "Unable to resolve {$name}'s constructor parameter '{$param->getName()}' without a resolvable type."
                         );
                     }
-
-                    $args[] = $this->get((string) $type);
                 }
             }
 
-            $instance = new $class_name(...$args);
+            $instance = new $name(...$args);
         }
 
         if (isset($binding) && $binding->isShared()) {
             // cache the shared instance
-            $this->instances[$class_name] = $instance;
+            $this->instances[$name] = $instance;
         }
 
         // this is where added listeners can perform additional configurations.
@@ -88,11 +98,18 @@ class Container implements ArrayAccess {
     }
 
 
-    public function has(string $class_name) {
-        return (
-            isset($this->bindings[$class_name]) ||
-            isset($this->instances[$class_name])
-        );
+
+    /**
+     * Get the class or interface name the container can resolve for a parameter.
+     * Returns null when the parameter has no type hint, is a union/intersection
+     * type, or is a built-in type (int, string, array, etc.).
+     *
+     * @param ReflectionParameter $param The constructor parameter to inspect.
+     * @return string|null The type name to resolve, or null if it can't be autowired.
+     */
+    private function getResolvable(ReflectionParameter $param): ?String {
+        $type = $param->getType();
+        return (isSingleType($type) && !$type->isBuiltin()) ? $type->getName() : null;
     }
 
     /**
@@ -133,8 +150,8 @@ class Container implements ArrayAccess {
         } elseif ($param->isDefaultValueAvailable()) {
             return $param->getDefaultValue();
 
-        } elseif ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
-            return $this->get($type->getName()::class);
+        } elseif (isSingleType($type) && !$type->isBuiltin()) {
+            return $this->get($type->getName());
 
         // or is nullable
         } elseif ($param->allowsNull()) {
@@ -145,6 +162,13 @@ class Container implements ArrayAccess {
     }
 
     // ArrayAccess methods
+
+    public function has(string $name) {
+        return (
+            isset($this->bindings[$name]) ||
+            isset($this->instances[$name])
+        );
+    }
 
     public function offsetExists(mixed $key): bool {
         return $this->has($key);

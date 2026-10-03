@@ -12,16 +12,9 @@ class HomeController extends Controller {
     ) {}
 
     public function index(): Response {
-        if ($response = $this->view('home',
-            [
-                'title' => 'Home',
-                'listings' => $this->listings->findAll(6),
-                // 'search' => $_GET['search'] ?? null
-            ]
-        )) {
-            return $response;
-        } else {
-            throw new HttpException(404, 'Page not found');
-        }
+        return $this->view('home', [
+            'title' => 'Home',
+            'listings' => $this->listings->findAll(6),
+        ]);
     }
 }

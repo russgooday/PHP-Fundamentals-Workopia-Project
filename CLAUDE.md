@@ -31,7 +31,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Sessions / flash messages:** age-based (not access-based) flash messages in `Session`; new messages are stored at the end of the request and shared into views as the `session` variable (the `Session` object is passed directly, no proxy).
 
-**Errors:** `ErrorHandler` and `HttpException` handle failures; the error path is deliberately separate from the normal `Response` flow. Do not add view-existence checks: missing view files should bubble up to the global handler.
+**Errors:** `ErrorHandler` and `HttpException` handle failures; the error path is deliberately separate from the normal `Response` flow. A missing view is detected once, in `PHPViewer::render()`, which throws `ViewNotFoundException` (a 404 `HttpException`; the real cause is to be logged). Controllers do not check whether a view exists; they only check genuinely data-dependent conditions (e.g. a record exists).
 
 ## Conventions
 

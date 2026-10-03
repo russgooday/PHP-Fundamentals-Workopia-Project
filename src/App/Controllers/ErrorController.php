@@ -15,8 +15,8 @@ class ErrorController extends Controller {
         ?string $message = null,
         ?string $return_url = null
     ): void {
-        http_response_code($status_code);
         $error_message = $this->messages->fetchError($status_code, $message, $return_url);
+        http_response_code($error_message['status_code']);
 
         echo $this->viewer->render('error', $error_message);
     }
