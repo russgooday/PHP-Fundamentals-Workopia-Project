@@ -1,5 +1,5 @@
 <?php
-namespace Spikes\Fixtures;
+namespace Fixtures;
 
 class UnresolvableClass {
     public function __construct(string $host, int $port) {}
@@ -51,7 +51,7 @@ class Listings {
 
 class Mailer {
     public function __construct(
-        private Logger $logger
+        public readonly Logger $logger
     ) {}
 
     public function send(string $to): void {
@@ -72,6 +72,20 @@ class Notifier {
         $this->logger->log("Notifying: {$message}");
         $this->mailer->send('someone@example.com');
     }
+}
+
+// An interface can't be autowired; it needs a binding to a concrete class.
+interface Cache {}
+
+class FileCache implements Cache {}
+
+// Used to test Container::getMethodArguments() mapping route params onto an action.
+class ArgsController {
+    public function show(int $job_id, Logger $logger, string $sort = 'asc', ?string $filter = null): void {}
+
+    public function nullable(?string $filter): void {}
+
+    public function needsId(int $id): void {}
 }
 
 // Three levels deep overall: ListingsController -> Notifier -> Mailer -> Logger

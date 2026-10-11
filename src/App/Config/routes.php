@@ -9,13 +9,13 @@ class Routes {
             ->get('/', 'HomeController')
             ->get('/listings', 'ListingsController')
             ->get('/listings/create', 'ListingsController@create')
-            ->get('/listings/{job_id}', 'ListingsController@show')
-            ->get('/error/{status_code}', 'ErrorController')
-            ->get('/listings/{job_id}/edit', 'ListingsController@edit')
+            ->get('/listings/{job_id:\d+}', 'ListingsController@show')
+            // ->get('/error/{status_code}', 'ErrorController')
+            ->get('/listings/{job_id:\d+}/edit', 'ListingsController@edit')
 
             ->post('/listings/store', 'ListingsController@store')
-            ->put('/listings/{job_id}', 'ListingsController@update')
-            ->delete('/listings/{job_id}', 'ListingsController@delete');
+            ->put('/listings/{job_id:\d+}', 'ListingsController@update')
+            ->delete('/listings/{job_id:\d+}', 'ListingsController@delete');
 
         return $router;
     }

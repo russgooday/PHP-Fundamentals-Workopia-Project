@@ -24,17 +24,13 @@ class ListingsController extends Controller {
      * @return Response
      */
     public function index(): Response {
-        if ($listings = $this->listings->findAll()) {
-            return $this->view(
-                'listings/index',
-                [
-                    'title' => 'Listings',
-                    'listings' => $listings
-                ]
-            );
-        } else {
-            throw new HttpException(404, 'Sorry, no jobs found');
-        }
+        return $this->view(
+            'listings/index',
+            [
+                'title' => 'Listings',
+                'listings' => $this->listings->findAll()
+            ]
+        );
     }
 
 

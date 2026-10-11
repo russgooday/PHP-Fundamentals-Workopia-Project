@@ -40,15 +40,24 @@ abstract class FormRequest {
     }
 
     public function sanitized(): array {
+        // TODO: currently only handles strings
+
         $data = $this->validated();
         $overrides = $this->sanitize_overrides;
 
         foreach ($data as $key => $value) {
+
+            if (!is_string($value)) {
+                continue;
+            }
+
             $callback = $overrides[$key] ?? null;
 
-            $data[$key] = is_callable($callback)
-                ? $callback($value)
-                : stripAndNullify($value);
+            if (is_callable($callback)) {
+                $data[$key] = $callback($value);
+            } else {
+                $data[$key] = stripAndNullify($value);
+            }
         }
 
         return $data;

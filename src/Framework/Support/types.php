@@ -31,15 +31,21 @@ function castTo(?string $type, mixed $val): mixed {
  */
 function toFloat(?string $value): ?float {
     // trying to parse null will cause a fatal Error
-    if ($value === null) {
+    if ($value == null) {
         return null;
     }
-    // note PHP 8.1+ allows static variables in functions
-    static $formatter = new NumberFormatter('en_US', NumberFormatter::DECIMAL);
-    $result = $formatter->parse($value);
 
-    return $result === false ? null : (float) $result;
+    // trim the value to remove any leading or trailing whitespace
+    $value = trim($value);
+
+    if (preg_match('#^-?(\d{1,3}(,\d{3})*|\d+)(\.\d+)?$#', $value)) {
+        $value = (float) str_replace(',', '', $value);
+        return is_finite($value) ? $value : null;
+    }
+
+    return null;
 }
+
 
 /**
  * Checks if the given type is a single named type.

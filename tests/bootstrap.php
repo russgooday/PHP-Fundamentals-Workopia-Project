@@ -1,5 +1,5 @@
 <?php
-require_once dirname(__DIR__) . '/src/App/functions.php';
+require_once dirname(__DIR__) . '/src/Framework/functions.php';
 require_once dirname(__DIR__) . '/autoloader.php';
 
 (new Autoloader())

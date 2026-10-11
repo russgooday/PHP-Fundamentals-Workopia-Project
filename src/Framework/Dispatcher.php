@@ -14,9 +14,24 @@ class Dispatcher {
     ){}
 
     public function dispatch(Request $request): Response {
+        $method = $request->method();
+
+        if (!$this->router->hasMethod($method)) {
+            throw new HttpException(400, "Unsupported request method '{$method}'.");
+        }
+
         // get the controller and route parameters from the router
-        if (!$routeData = $this->router->match($request->uri, $request->method())) {
+        if (!$routeData = $this->router->match($request->uri, $method)) {
             throw new HttpException(404);
+        }
+
+        // temporary will be going
+        if ($method !== 'GET') {
+            $session = $this->container->get(Session::class);
+
+            if (!hash_equals($session->csrfToken(), $request->post['_token'] ?? '')) {
+                throw new HttpException(403);
+            }
         }
 
         // get the action from the controller string

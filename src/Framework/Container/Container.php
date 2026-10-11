@@ -6,7 +6,6 @@ use InvalidArgumentException,
     ReflectionClass,
     ReflectionMethod,
     ReflectionParameter,
-    ReflectionNamedType,
     ArrayAccess;
 
 

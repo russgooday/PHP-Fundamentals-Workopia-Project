@@ -33,6 +33,7 @@ if (!function_exists('array_last')) {
     }
 }
 
+
 /**
  * Finds the first element in $haystack that matches any of the $needles.
  *
@@ -42,10 +43,8 @@ if (!function_exists('array_last')) {
  * @return mixed The first matching needle, or the default value if none are found.
  */
 function findOneOf(array $needles, array $haystack, mixed $default = null): mixed {
-    $flipped = array_flip($haystack);
-
-    foreach($needles as $needle) {
-        if (isset($flipped[$needle])) {
+    foreach ($needles as $needle) {
+        if (in_array($needle, $haystack, true)) {
             return $needle;
         }
     }
@@ -71,4 +70,57 @@ function filter_by_keys(array $arr, array $keys): array {
     }
 
     return $filtered;
+}
+
+
+/**
+ * Polyfill for array_is_list() for PHP versions < 8.1.
+ *
+ * @param array $array The array to check.
+ * @return bool True if the array is a list, false otherwise.
+ */
+if (!function_exists('array_is_list')) {
+    function array_is_list(array $array): bool
+    {
+        $i = 0;
+        foreach ($array as $k => $v) {
+            if ($k !== $i++) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+
+/**
+ * Sorts an array using the insertion sort algorithm and a custom comparison function.
+ *
+ * @param array $arr The array to sort.
+ * @param callable $fn The comparison function, which should return a negative, zero, or positive value.
+ * @return array The sorted array.
+ */
+function insertSort(array $arr, callable $fn): array {
+    // Ensure the array is a sequential list.
+    if (!array_is_list($arr)) {
+        $arr = array_values($arr);
+    }
+
+    $len = count($arr);
+    $i = 1;
+
+    while ($i < $len) {
+        $temp = $arr[$i];
+        $j = $i - 1;
+
+        while ($j >= 0 && $fn($arr[$j], $temp) > 0) {
+            $arr[$j + 1] = $arr[$j]; // shift right
+            $j--;
+        }
+
+        $arr[$j + 1] = $temp;
+        $i++;
+    }
+
+    return $arr;
 }

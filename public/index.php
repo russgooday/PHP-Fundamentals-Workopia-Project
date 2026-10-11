@@ -1,7 +1,7 @@
 <?php
-require_once '../src/App/helpers.php';
-require_once '../src/Framework/functions.php';
-require_once '../autoloader.php';
+require_once __DIR__ . '/../src/App/helpers.php';
+require_once __DIR__ . '/../src/Framework/functions.php';
+require_once __DIR__ . '/../autoloader.php';
 
 $auto_loader = (new Autoloader())
     ->addNamespace('App\\', 'src/App/')
@@ -39,8 +39,11 @@ $session = $container->get(Session::class);
 $session->start();
 
 $dispatcher = new Dispatcher($router, $container);
-$response = $dispatcher->dispatch(new Request);
 
-$session->storeNewMessages();
+try {
+    $response = $dispatcher->dispatch($container[Request::class]);
+} finally {
+    $session->storeNewMessages();
+}
 
 $response->send();

@@ -40,6 +40,7 @@ class PHPViewer implements ViewerInterface {
 
 
     public function renderForEach(string $view, array $data, string $name): string {
+        // TODO: does is_file + array_merge per row; resolve the path once.
         $output = '';
 
         foreach ($data as $item) {

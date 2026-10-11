@@ -1,6 +1,8 @@
 <?php
 namespace App\Config;
+
 use Framework\{
+    Request,
     Response,
     Database,
     Controller,
@@ -8,6 +10,7 @@ use Framework\{
     ViewerInterface,
     PHPViewer
 };
+
 use Framework\Container\Container;
 use Framework\Validation\MessageLoader;
 
@@ -20,6 +23,7 @@ class Services {
 
         $container
             ->singleton(Session::class, fn() => new Session())
+            ->singleton(Request::class, fn() => new Request())
             ->singleton(Database::class, fn() => new Database(...$db_config))
             ->singleton(MessageLoader::class, fn() => new MessageLoader($validation_msgs_path))
             ->singleton(ViewerInterface::class, fn() => new PHPViewer());

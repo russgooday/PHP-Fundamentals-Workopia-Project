@@ -17,6 +17,7 @@
                     <a href="/listings/<?= e($job->id) ?>/edit" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">Edit</a>
                     <!-- Delete Form -->
                     <form method="POST" action="/listings/<?= e($job->id) ?>">
+                        <input type='hidden' name='_token' value='<?= e($session->csrfToken()) ?>'>
                         <input type="hidden" name="_method" value="DELETE">
                         <button
                             type="submit"

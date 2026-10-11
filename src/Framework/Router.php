@@ -73,6 +73,17 @@ class Router {
         return $this;
     }
 
+
+    /**
+     * Checks if the router has any routes registered for the given HTTP method.
+     * @param string $method The HTTP method to check (e.g. 'GET', 'POST').
+     * @return bool Returns true if there are routes for the method, false otherwise.
+     */
+    public function hasMethod(string $method): bool {
+        return isset($this->routes[strtoupper($method)]);
+    }
+
+
     /**
      * Matches a URI against registered routes for the given HTTP method.
      * @param string $uri The request URI to match against registered routes.
@@ -82,6 +93,11 @@ class Router {
      */
     public function match(string $uri, string $method = 'GET'): array|false {
         $method = strtoupper($method);
+
+        // check if method exists e.g. 'GET', 'POST', etc.
+        if (!$this->hasMethod($method)) {
+            return false;
+        }
 
         foreach ($this->routes[$method] as $route) {
             if ($matched = $this->routeMatch($route['uri'], $uri)) {
@@ -96,6 +112,9 @@ class Router {
         return false;
     }
 
+    private const __PARAM_REGEX = '#^\{([^}]+)\}$#';
+
+    private const PARAM_REGEX = '#^\{([^:]+?)(?::(.*))?\}$#';
 
     /**
      * Checks whether a URI matches a route template and if a match is found
@@ -103,10 +122,16 @@ class Router {
      * @param string $route The route template, e.g. '/items/:id'.
      * @param string $uri The full URI or path to test.
      * @return array{params:array<string,string>}|null
-     * @example routeMatch('/listings/:id', '.../listings/23') -> ['params'=>['id'=>'23']]
+     * @example routeMatch('/listings/{id}', '.../listings/23') -> ['params'=>['id'=>'23']]
      */
-    public function routeMatch(string $route, string $uri, string $rx='#^\{([^}]+)\}$#'): ?array {
-        $uri = $this->_normalisePath(parse_url($uri, PHP_URL_PATH));
+    public function routeMatch(string $route, string $uri): ?array {
+        $path = parse_url($uri, PHP_URL_PATH);
+
+        if (!is_string($path)) {
+            return null;
+        }
+
+        $uri = $this->_normalisePath($path);
 
         $route_parts = $this->_splitPathToParts($route);
         $uri_parts = $this->_splitPathToParts($uri);
@@ -124,8 +149,15 @@ class Router {
             }
 
             // we have found a matching parameter
-            if (preg_match($rx, $route_part, $matches)) {
-                $params[$matches[1]] = $uri_part;
+            if (preg_match(self::PARAM_REGEX, $route_part, $matches)) {
+                $name = $matches[1];
+                $regex = $matches[2] ?? null;
+
+                if ($regex && !preg_match("#^$regex$#", $uri_part)) {
+                    return null;
+                }
+
+                $params[$name] = $uri_part;
                 continue;
             }
             // not a match, so exit with false

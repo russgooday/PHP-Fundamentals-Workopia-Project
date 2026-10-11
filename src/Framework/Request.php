@@ -6,7 +6,8 @@ namespace Framework;
  *  rather than the superglobals themselves, which can be modified by other code.
  */
 class Request {
-
+    // TODO: toying with the idea of wrapping superglobals ($_GET, $_POST, etc.) in this class for better encapsulation.
+    // TODO: e.g. adding helper methods such as 'has($key)' to check if a key exists in the request data.
     public string $uri;
     public string $method;
     public array $get;
@@ -26,9 +27,11 @@ class Request {
     }
 
     public function method(): string {
+        $_method = $this->post['_method'] ?? null;
+
         // if PUT or DELETE have been passed as a method override
-        if ($this->method === 'POST' && isset($this->post['_method'])) {
-            return $this->post['_method'];
+        if ($this->method === 'POST' && is_string($_method)) {
+            return $_method;
         }
 
         return $this->method;

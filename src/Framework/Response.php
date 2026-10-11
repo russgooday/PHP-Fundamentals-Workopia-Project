@@ -6,7 +6,7 @@ class Response {
     protected int $status_code = 200;
     protected string $body = '';
 
-    public function redirect(string $url, string $field = 'Location' ): self {
+    public function redirect(string $url, string $field = 'Location'): self {
         $this->addHeader($field, $url);
         return $this;
     }
@@ -28,8 +28,6 @@ class Response {
 
     public function send(): void {
         http_response_code($this->status_code);
-
-        // TODO: look into clearing the cache on hitting back button;
 
         foreach ($this->headers as $field => $value) {
             header("{$field}: {$value}");

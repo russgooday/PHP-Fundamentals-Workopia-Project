@@ -57,6 +57,10 @@ class Session {
         session_regenerate_id(true);
     }
 
+    public function csrfToken(): string {
+        return $_SESSION['csrf'] ??= bin2hex(random_bytes(32));
+    }
+
     public function destroy(): void {
         $_SESSION = [];
 
