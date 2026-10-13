@@ -15,7 +15,7 @@ Hand-rolled MVC framework: autoloader, DI container with `afterResolving` hooks,
 ## 🔴 Critical
 
 - [x] **Reflected XSS in the create/edit form: DONE.** `create.view.php:15` printed `$job->id` unescaped, and `store()` re-renders with `(object) $request->post`, so a posted `id=">…` landed in the `action` attribute. 📖 on the original (`git show HEAD`), 🧪 on the patched version: now `e($job->id)` and the payload is escaped. Better still, build `$job` in `store()` without an `id` key.
-- [ ] **No CSRF protection.** Every POST/PUT/DELETE is forgeable, including Delete at `show.view.php:19`. 📖 Exploitable once auth exists. Also what made the XSS above cross-site reachable.
+- [x] **No CSRF protection: DONE.** Every POST/PUT/DELETE was forgeable, including Delete at `show.view.php:19`. 📖 Exploitable once auth exists. Also what made the XSS above cross-site reachable.
 - [x] **Unknown HTTP methods give a 500: DONE.** `Request::method()` returned any `_method` value and `Router::match` read `$this->routes[$method]`, undefined for `PATCH`, `HEAD`, `OPTIONS`, `_method=foo`. Fixed without a second method list: `Router::match` returns `false` when `isset($this->routes[$method])` fails (`Router.php:87`), and `Request::method()` only honours `_method` on POST when it `is_string` (`Request.php:31`). The router's `$routes` keys are the single source of truth, so adding `PATCH` later means touching only the router. 🧪 Re-tested: `PATCH`, `OPTIONS` and `_method=foo` → 404. Note: `_method[]=x` still returns 500, but that now comes from `Validator::trimStrings` (see "Array input crashes the validator" below), not from method handling.
 - [x] **Malformed URI gives a 500: DONE.** `routeMatch` now returns `null` when `parse_url` doesn't give a string (`Router.php:127`). 🧪 `GET //x` → 404.
 - [x] **Array input crashes the validator: DONE.** Only reachable with a hand-crafted request; your forms never send arrays. `trimStrings` skips non-strings (`Validator.php`), the checks accept `mixed` and fail cleanly, and `FormRequest::sanitized()` only cleans strings and leaves arrays untouched (`FormRequest.php:50`). ▶ `ValidatorTest` covers the array cases, and a field declared `array:php,mysql` now passes through `validate()`, `validated()` and `sanitized()`. Parked for later: recursive cleaning of array contents, and passing the cleaner in as a callback.
@@ -134,7 +134,7 @@ is_dir($dir) || @mkdir($dir, 0775, true);
 
 **9. Error route.** Remove `->get('/error/{status_code}', 'ErrorController')` from `routes.php`. Only the exception handler should call `ErrorController`.
 
-**Suggested order:** ~~1~~ done → 2, 4, 5 (real bugs in the normal flow, each a few lines) → 9 → 3 (CSRF) → 6/7 → the rest.
+**Suggested order:** ~~1~~ done → 2, 4, 5 (real bugs in the normal flow, each a few lines) → 9 → ~~3~~ (CSRF) done → 6/7 → the rest.
 
 ---
 

@@ -105,7 +105,7 @@ class ListingsController extends Controller {
                 'listings/create',
                 [
                     'errors' => $formRequest->getErrors(),
-                    'job' => (object) $formRequest->getPost()
+                    'job' => (object) $this->request->post
                 ]
             );
         }
@@ -142,7 +142,7 @@ class ListingsController extends Controller {
 
         } else {
 
-            $post_data = $formRequest->getRequest()->post;
+            $post_data = $this->request->post;
             $errors = $formRequest->getErrors();
 
             return $this->view(

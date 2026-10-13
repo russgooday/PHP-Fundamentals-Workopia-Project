@@ -75,12 +75,12 @@ class Router {
 
     /**
      * Adds middleware to the last registered route.
-     * @param string $key The middleware key to associate with the route.
+     * @param array $keys The middleware keys to associate with the route.
      * @return self Returns the router instance for method chaining.
      */
-    public function middleware(string $key): self {
+    public function middleware(array $keys): self {
         if (!empty($this->routes)) {
-            $this->routes[array_key_last($this->routes)]['middleware'] = $key;
+            $this->routes[array_key_last($this->routes)]['middleware'] = $keys;
         }
         return $this;
     }

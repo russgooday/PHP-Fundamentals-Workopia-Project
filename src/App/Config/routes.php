@@ -6,7 +6,7 @@ class Routes {
     public static function register(Router $router): Router {
 
         $router
-            ->get('/', 'HomeController')
+            ->get('/', 'HomeController')->middleware(['example'])
             ->get('/listings', 'ListingsController')
             ->get('/listings/create', 'ListingsController@create')
             ->get('/listings/{job_id:\d+}', 'ListingsController@show')

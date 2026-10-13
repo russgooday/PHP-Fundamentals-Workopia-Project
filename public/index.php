@@ -18,7 +18,7 @@ use Framework\{
 
 use Framework\Container\Container;
 
-use App\Config\{Services, Routes};
+use App\Config\{Services, Routes, Middleware};
 
 // register the services container
 $container = Services::register(new Container);
@@ -35,11 +35,13 @@ set_error_handler($error_handler('handleError'));
 // register the routes
 $router = Routes::register(new Router);
 
+$middlewares = Middleware::register();
+
 $session = $container->get(Session::class);
+
 $session->start();
 
-$middleware = $container->get(App\Middleware\ChangeResponse::class);
-$dispatcher = new Dispatcher($router, $container, [$middleware, clone $middleware, clone $middleware]);
+$dispatcher = new Dispatcher($router, $container, $middlewares);
 
 try {
     $response = $dispatcher->dispatch($container[Request::class]);

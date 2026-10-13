@@ -27,7 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Controllers** extend `Framework\Controller`, which exposes `view()`, `redirect()`, `addHeader()` returning a `Response`. Routes are declared as `'ControllerName@action'` strings in `src/App/Config/routes.php` (no `@` means the default action, e.g. `index`). Views live in `src/App/views/` (`*.view.php`, partials in `views/partials/`) and are rendered by `PHPViewer` behind `ViewerInterface`. Sanitize at view render time, not at storage.
 
-**Models / validation:** `Framework\Model` wraps PDO via `Database`. `FormRequest` (e.g. `App\FormRequests\ListingsFormRequest`) uses `Validation\Validator`, with `ValidatorChecks` and `MessageLoader` (default messages in `Validation/messages.php`).
+**Models / validation:** `Framework\Model` wraps PDO via `Database`. `FormRequest` (e.g. `App\FormRequests\ListingsFormRequest`) uses `Validation\Validator`, with `ValidatorChecks`. `Validator` loads its own default messages (`Validation/messages.php`) and merges in any custom messages the form supplies via its `$messages` property.
 
 **Sessions / flash messages:** age-based (not access-based) flash messages in `Session`; new messages are stored at the end of the request and shared into views as the `session` variable (the `Session` object is passed directly, no proxy).
 

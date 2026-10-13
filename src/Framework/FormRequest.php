@@ -28,14 +28,6 @@ abstract class FormRequest {
         return $this->validator->getErrors();
     }
 
-    public function getRequest(): Request {
-        return $this->request;
-    }
-
-    public function getPost(): array {
-        return $this->request->post;
-    }
-
     public function validated(): array {
         return $this->validator->validated();
     }
