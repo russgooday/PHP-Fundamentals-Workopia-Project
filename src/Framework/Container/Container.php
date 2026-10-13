@@ -29,6 +29,12 @@ class Container implements ArrayAccess {
         return $this;
     }
 
+    // Manually set an instance for a given name (useful for pre-existing objects)
+    public function setInstance(string $name, object $instance): static {
+        $this->instances[$name] = $instance;
+        return $this;
+    }
+
     // Register a callback to be executed after a specific service is resolved.
     public function afterResolving(string $name, callable $handler): static {
         $this->events->on('afterResolving', $name, $handler);
@@ -86,7 +92,7 @@ class Container implements ArrayAccess {
 
         if (isset($binding) && $binding->isShared()) {
             // cache the shared instance
-            $this->instances[$name] = $instance;
+            $this->setInstance($name, $instance);
         }
 
         // this is where added listeners can perform additional configurations.

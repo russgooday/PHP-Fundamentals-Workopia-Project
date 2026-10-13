@@ -1,7 +1,6 @@
 <?php
 namespace App\Controllers;
 
-use Framework\Exceptions\HttpException;
 use Framework\{Controller, Response};
 use App\Models\Listings;
 

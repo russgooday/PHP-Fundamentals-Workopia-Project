@@ -10,11 +10,13 @@ class Dispatcher {
 
     public function __construct(
         private Router $router,
-        private Container $container
+        private Container $container,
+        private array $middleware = []
     ){}
 
     public function dispatch(Request $request): Response {
         $method = $request->method();
+        $container = $this->container;
 
         if (!$this->router->hasMethod($method)) {
             throw new HttpException(400, "Unsupported request method '{$method}'.");
@@ -27,7 +29,7 @@ class Dispatcher {
 
         // temporary will be going
         if ($method !== 'GET') {
-            $session = $this->container->get(Session::class);
+            $session = $container->get(Session::class);
 
             if (!hash_equals($session->csrfToken(), $request->post['_token'] ?? '')) {
                 throw new HttpException(403);
@@ -35,15 +37,19 @@ class Dispatcher {
         }
 
         // get the action from the controller string
-        [$controller, $action] = $this->parseController($routeData['controller']);
+        [$controller_name, $action] = $this->parseController($routeData['controller']);
 
-        // get the controller class and resolve its dependencies
-        $controller_class = $this->getController($controller);
+        // resolve the controller
+        $controller = $this->getController($controller_name);
 
-        // get the required controller method arguments from the route parameters
-        $args = $this->container->getMethodArguments($controller_class, $action, $routeData['params']);
-        // inspectAndDie($action);
-        return $controller_class->$action(...$args);
+        // create the controller request handler with the resolved controller and action
+        $handler = new ControllerRequestHandler($container, $controller, $action, $routeData['params']);
+
+        // create the middleware request handler with the middleware stack and the final controller handler
+        $requestHandler = new MiddlewareRequestHandler($this->middleware, $handler);
+
+        // execute the middleware pipeline with the request and the final handler
+        return $requestHandler->handle($request);
     }
 
 

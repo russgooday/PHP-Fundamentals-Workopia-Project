@@ -17,21 +17,24 @@ class Validator {
 
     private array $errors = [];
 
+    private array $messages = [];
+
     // Instance of ValidatorChecks to perform the actual validation logic.
     private ValidatorChecks $checks;
 
     /**
      * @param array $data The data to validate, keyed by field name.
      * @param array $rules The rules to validate each field against, keyed by field name.
-     * @param array $messengers The message templates used to build error messages, keyed by rule name.
+     * @param array $custom_messages Custom error messages, to add to the default messages.
      */
     public function __construct(
         private array $data,
         private array $rules,
-        private array $messengers
+        private array $custom_messages = []
     ) {
         $this->checks = new ValidatorChecks();
         $this->data = $this->trimStrings($data);
+        $this->messages = $this->loadMessages('messages.php', $custom_messages);
     }
 
 
@@ -184,6 +187,23 @@ class Validator {
 
 
     /**
+     * Loads the validation messages from the default file and merges them with any custom messages provided.
+     *
+     * @param array $custom_messages Custom error messages to merge with the default messages.
+     * @return array The merged array of validation messages.
+     */
+    private function loadMessages(string $file, array $custom_messages): array {
+        $file = __DIR__ . '/' . $file;
+
+        if (!file_exists($file)) {
+            throw new \RuntimeException("Messages file not found: {$file}");
+        }
+
+        return array_replace_recursive(require $file, $custom_messages);
+    }
+
+
+    /**
      * Builds the error message for a failed rule, choosing the numeric or string
      * variant for size rules (min, max, between) based on whether the field
      * also has a numeric rule.
@@ -196,16 +216,16 @@ class Validator {
      * @return string The formatted error message.
      */
     private function getMessage(string $rule, string $name, string $type, array $args): string {
-        $messenger = $this->messengers[$rule] ?? null;
+        $message = $this->messages[$rule] ?? null;
 
         // size rules hold a message per data type, e.g. ['numeric' => fn, 'string' => fn]
-        if ($this->sizeRule($rule) && is_array($messenger)) {
-            $messenger = $messenger[$type] ?? null;
+        if ($this->sizeRule($rule) && is_array($message)) {
+            $message = $message[$type] ?? null;
         }
 
-        return is_callable($messenger)
-            ? $messenger($name, ...$args)
-            : $this->messengers['default']($name);
+        return is_callable($message)
+            ? $message($name, ...$args)
+            : $this->messages['default']($name);
     }
 
 

@@ -2,8 +2,7 @@
 
 namespace Framework;
 
-use Framework\Validation\Validator,
-    Framework\Validation\MessageLoader;
+use Framework\Validation\Validator;
 
 abstract class FormRequest {
     protected Validator $validator;
@@ -11,16 +10,14 @@ abstract class FormRequest {
     // Array of validation rules for the form request.
     protected array $rules = [];
 
+    // Array of custom error messages for the form request.
+    protected array $messages = [];
+
     // Array of callbacks to override default sanitization for specific fields.
     protected array $sanitize_overrides = [];
 
-    public function __construct(
-        protected Request $request,
-        protected MessageLoader $messages
-    ) {
-        $this->validator = new Validator(
-            $request->post, $this->rules, $messages->load()
-        );
+    public function __construct(protected Request $request) {
+        $this->validator = new Validator($request->post, $this->rules, $this->messages);
     }
 
     public function validate(): bool {
@@ -33,6 +30,10 @@ abstract class FormRequest {
 
     public function getRequest(): Request {
         return $this->request;
+    }
+
+    public function getPost(): array {
+        return $this->request->post;
     }
 
     public function validated(): array {

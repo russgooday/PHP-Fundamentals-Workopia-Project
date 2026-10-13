@@ -6,7 +6,8 @@ use Closure;
 
 class Binding {
     public function __construct(
-        private Closure $fn, private bool $shared
+        private Closure $fn,
+        private bool $shared
     ){}
 
     public function isShared(): bool {

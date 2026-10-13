@@ -38,7 +38,8 @@ $router = Routes::register(new Router);
 $session = $container->get(Session::class);
 $session->start();
 
-$dispatcher = new Dispatcher($router, $container);
+$middleware = $container->get(App\Middleware\ChangeResponse::class);
+$dispatcher = new Dispatcher($router, $container, [$middleware, clone $middleware, clone $middleware]);
 
 try {
     $response = $dispatcher->dispatch($container[Request::class]);

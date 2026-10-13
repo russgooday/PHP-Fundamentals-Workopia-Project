@@ -12,20 +12,17 @@ use Framework\{
 };
 
 use Framework\Container\Container;
-use Framework\Validation\MessageLoader;
 
 class Services {
 
     public static function register(Container $container): Container {
 
         $db_config = parse_ini_file(Paths::ROOT . '/.env');
-        $validation_msgs_path = Paths::FRAMEWORK . '/Validation/messages.php';
 
         $container
             ->singleton(Session::class, fn() => new Session())
-            ->singleton(Request::class, fn() => new Request())
+            ->singleton(Request::class, fn() => Request::createFromGlobals())
             ->singleton(Database::class, fn() => new Database(...$db_config))
-            ->singleton(MessageLoader::class, fn() => new MessageLoader($validation_msgs_path))
             ->singleton(ViewerInterface::class, fn() => new PHPViewer());
 
         $container

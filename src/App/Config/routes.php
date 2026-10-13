@@ -4,14 +4,14 @@ use Framework\Router;
 
 class Routes {
     public static function register(Router $router): Router {
-        // May change target paths to actual controller classes.
+
         $router
             ->get('/', 'HomeController')
             ->get('/listings', 'ListingsController')
             ->get('/listings/create', 'ListingsController@create')
             ->get('/listings/{job_id:\d+}', 'ListingsController@show')
-            // ->get('/error/{status_code}', 'ErrorController')
             ->get('/listings/{job_id:\d+}/edit', 'ListingsController@edit')
+            // ->get('/error/{status_code}', 'ErrorController')
 
             ->post('/listings/store', 'ListingsController@store')
             ->put('/listings/{job_id:\d+}', 'ListingsController@update')
