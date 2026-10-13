@@ -47,6 +47,13 @@ class Dispatcher {
     }
 
 
+    /**
+     * Gets the middleware instances for the given global and route-specific middleware classes.
+     *
+     * @param array $global_classes The global middleware classes and their aliases.
+     * @param array $route_classes The route-specific middleware classes.
+     * @return array The resolved middleware instances.
+     */
     function getMiddleware(array $global_classes, array $route_classes = []): array {
         ['global' => $global, 'aliases' => $aliases] = $global_classes;
         $middlewares = [];
