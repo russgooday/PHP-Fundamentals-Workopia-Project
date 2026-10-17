@@ -5,23 +5,30 @@ namespace Framework;
 class Router {
     private const PARAM_REGEX = '#^\{([^:]+?)(?::(.*))?\}$#';
 
-    private array $routes = [];
+    private array $routes = [
+        'GET' => [],
+        'POST' => [],
+        'PUT' => [],
+        'DELETE' => []
+    ];
+
 
     /**
      * Register a route
      * @param string $method
      * @param string $uri
      * @param string $controller
-     * @return void
+     * @return Route A Route instance
      */
     public function registerRoute(
-        string $method, string $uri, string $controller
-    ): void {
-        $this->routes[] = [
-            'method' => $method,
-            'uri' => $uri,
-            'controller' => $controller,
-        ];
+        string $method,
+        string $uri,
+        string $controller
+    ): Route {
+        $route = new Route($method, $uri, $controller);
+        $this->routes[$method][] = $route;
+
+        return $route;
     }
 
 
@@ -29,11 +36,10 @@ class Router {
      * Add a GET route
      * @param string $uri
      * @param string $controller
-     * @return self
+     * @return Route
      */
-    public function get(string $uri, string $controller): self {
-        $this->registerRoute('GET', $uri, $controller);
-        return $this;
+    public function get(string $uri, string $controller): Route {
+        return $this->registerRoute('GET', $uri, $controller);
     }
 
 
@@ -41,11 +47,10 @@ class Router {
      * Add a POST route
      * @param string $uri
      * @param string $controller
-     * @return self
+     * @return Route
      */
-    public function post(string $uri, string $controller): self {
-        $this->registerRoute('POST', $uri, $controller);
-        return $this;
+    public function post(string $uri, string $controller): Route {
+        return $this->registerRoute('POST', $uri, $controller);
     }
 
 
@@ -53,11 +58,10 @@ class Router {
      * Add a PUT route
      * @param string $uri
      * @param string $controller
-     * @return self
+     * @return Route
      */
-    public function put(string $uri, string $controller): self {
-        $this->registerRoute('PUT', $uri, $controller);
-        return $this;
+    public function put(string $uri, string $controller): Route {
+        return $this->registerRoute('PUT', $uri, $controller);
     }
 
 
@@ -65,24 +69,10 @@ class Router {
      * Add a DELETE route
      * @param string $uri
      * @param string $controller
-     * @return self
+     * @return Route
      */
-    public function delete(string $uri, string $controller): self {
-        $this->registerRoute('DELETE', $uri, $controller);
-        return $this;
-    }
-
-
-    /**
-     * Adds middleware to the last registered route.
-     * @param array $keys The middleware keys to associate with the route.
-     * @return self Returns the router instance for method chaining.
-     */
-    public function middleware(array $keys): self {
-        if (!empty($this->routes)) {
-            $this->routes[array_key_last($this->routes)]['middleware'] = $keys;
-        }
-        return $this;
+    public function delete(string $uri, string $controller): Route {
+        return $this->registerRoute('DELETE', $uri, $controller);
     }
 
 
@@ -92,7 +82,7 @@ class Router {
      * @return bool Returns true if there are routes for the method, false otherwise.
      */
     public function hasMethod(string $method): bool {
-        return in_array(strtoupper($method), ['GET', 'POST', 'PUT', 'DELETE']);
+        return array_key_exists(strtoupper($method), $this->routes);
     }
 
 
@@ -106,24 +96,16 @@ class Router {
     public function match(string $uri, string $method = 'GET'): array|false {
         $method = strtoupper($method);
 
-        // check if method exists e.g. 'GET', 'POST', etc.
-        if (!$this->hasMethod($method)) {
-            return false;
-        }
+        foreach ($this->routes[$method] as $route) {
+            if ($matched = $this->routeMatch($route->uri, $uri)) {
 
-        foreach ($this->routes as $route) {
-
-            if ($route['method'] !== $method) {
-                continue;
-            }
-
-            if ($matched = $this->routeMatch($route['uri'], $uri)) {
-
-                return [
-                    'controller' => $route['controller'],
+                $props = [
+                    'controller' => $route->controller,
                     'params' => $matched['params'],
-                    'middleware' => $route['middleware'] ?? []
+                    'middleware' => $route->middleware
                 ];
+
+                return $props;
             }
         }
 
