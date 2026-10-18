@@ -99,7 +99,7 @@ class Route {
      */
     public function getMethodArguments(): array {
         return $this->container->getMethodArguments(
-            $this->controller, $this->action, $this->params ?? []
+            $this->getController(), $this->action, $this->params ?? []
         );
     }
 }
