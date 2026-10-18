@@ -33,7 +33,7 @@ set_exception_handler($error_handler('handleException'));
 set_error_handler($error_handler('handleError'));
 
 // register the routes
-$router = Routes::register(new Router);
+$router = Routes::register(new Router($container));
 
 $middlewares = Middleware::register();
 

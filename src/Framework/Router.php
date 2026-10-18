@@ -2,6 +2,8 @@
 
 namespace Framework;
 
+use Framework\Container\Container;
+
 class Router {
     private const PARAM_REGEX = '#^\{([^:]+?)(?::(.*))?\}$#';
 
@@ -11,6 +13,11 @@ class Router {
         'PUT' => [],
         'DELETE' => []
     ];
+
+
+    public function __construct(
+        private Container $container
+    ){}
 
 
     /**
@@ -26,7 +33,11 @@ class Router {
         string $controller
     ): Route {
         $route = new Route($method, $uri, $controller);
+
+        // add the route to the internal routes array
         $this->routes[$method][] = $route;
+
+        $route->setContainer($this->container);
 
         return $route;
     }
@@ -90,26 +101,21 @@ class Router {
      * Matches a URI against registered routes for the given HTTP method.
      * @param string $uri The request URI to match against registered routes.
      * @param string $method The HTTP method (e.g. 'GET', 'POST').
-     * @return array|false Returns an array with 'controller' and 'params' if
-     * a match is found, or false if no match is found.
+     * @return ?Route Returns a Route instance if a match is found, or null if no match is found.
      */
-    public function match(string $uri, string $method = 'GET'): array|false {
+    public function match(string $uri, string $method = 'GET'): ?Route {
         $method = strtoupper($method);
 
         foreach ($this->routes[$method] as $route) {
             if ($matched = $this->routeMatch($route->uri, $uri)) {
 
-                $props = [
-                    'controller' => $route->controller,
-                    'params' => $matched['params'],
-                    'middleware' => $route->middleware
-                ];
+                $route->setParams($matched['params']);
 
-                return $props;
+                return $route;
             }
         }
 
-        return false;
+        return null;
     }
 
 
@@ -120,6 +126,7 @@ class Router {
      * @param string $uri The full URI or path to test.
      * @return array{params:array<string,string>}|null
      * @example routeMatch('/listings/{id}', '.../listings/23') -> ['params'=>['id'=>'23']]
+     * TODO: Cleanup this messy implementation.
      */
     public function routeMatch(string $route, string $uri): ?array {
         $path = parse_url($uri, PHP_URL_PATH);
