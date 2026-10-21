@@ -5,7 +5,7 @@ namespace Framework;
 use Framework\Container\Container;
 
 class Router {
-    private const PARAM_REGEX = '#^\{([^:]+?)(?::(.*))?\}$#';
+    private const PARAM_REGEX = '#^\{([^}]+)\}$#'; // '#^\{([^:]+?)(?::(.*))?\}$#';
 
     private array $routes = [
         'GET' => [],
@@ -107,7 +107,7 @@ class Router {
         $method = strtoupper($method);
 
         foreach ($this->routes[$method] as $route) {
-            if ($matched = $this->routeMatch($route->uri, $uri)) {
+            if ($matched = $this->routeMatch($route, $uri)) {
 
                 $route->setParams($matched['params']);
 
@@ -122,13 +122,13 @@ class Router {
     /**
      * Checks whether a URI matches a route template and if a match is found
      * returns named parameter values.
-     * @param string $route The route template, e.g. '/items/:id'.
+     * @param Route $route The route instance.
      * @param string $uri The full URI or path to test.
      * @return array{params:array<string,string>}|null
      * @example routeMatch('/listings/{id}', '.../listings/23') -> ['params'=>['id'=>'23']]
      * TODO: Cleanup this messy implementation.
      */
-    public function routeMatch(string $route, string $uri): ?array {
+    public function routeMatch(Route $route, string $uri): ?array {
         $path = parse_url($uri, PHP_URL_PATH);
 
         if (!is_string($path)) {
@@ -137,7 +137,7 @@ class Router {
 
         $uri = $this->_normalisePath($path);
 
-        $route_parts = $this->_splitPathToParts($route);
+        $route_parts = $this->_splitPathToParts($route->uri);
         $uri_parts = $this->_splitPathToParts($uri);
         $params = [];
 
@@ -155,9 +155,11 @@ class Router {
             // we have found a matching parameter
             if (preg_match(self::PARAM_REGEX, $route_part, $matches)) {
                 $name = $matches[1];
-                $regex = $matches[2] ?? null;
+                $pattern = $route->pattern[$name] ?? null;
 
-                if ($regex && !preg_match("#^$regex$#", $uri_part)) {
+                inspect($route);
+
+                if ($pattern && !preg_match("#^$pattern$#", $uri_part)) {
                     return null;
                 }
 
