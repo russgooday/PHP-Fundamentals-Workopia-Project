@@ -149,6 +149,11 @@ class Route {
     }
 
 
+    /**
+     * Retrieves the controller instance associated with the route.
+     *
+     * @return Controller The controller instance.
+     */
     public function getController(): Controller {
         if (!($this->controller instanceof Controller)) {
             $this->controller = $this->container->get($this->controller_class);
