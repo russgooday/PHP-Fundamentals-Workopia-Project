@@ -12,8 +12,31 @@ class RouteCompiler {
     const PARAM_FLAGS = PREG_OFFSET_CAPTURE | PREG_SET_ORDER;
 
 
-    static public function compilePattern(string $route, $patterns = [], $defaults = []) {
-        $params = [];
+    /**
+     * Compiles a route string into a regular expression pattern.
+     *
+     * @param string $route The route pattern to compile.
+     * @param array $patterns Optional array of parameter patterns.
+     * @param array $defaults Optional array of default parameter values.
+     * @return string The compiled regular expression pattern.
+     */
+    static public function compilePattern(string $route, $patterns = [], $defaults = []): string {
+        return self::compile(self::tokenize($route, $patterns, $defaults));
+    }
+
+
+    /**
+     * Tokenizes a route string into an array of tokens.
+     * Each token represents either a static text segment or a route parameter.
+     *
+     * @param string $route The route pattern to tokenize.
+     * @param array $patterns Optional array of parameter patterns.
+     * @param array $defaults Optional array of default parameter values.
+     * @return array The array of tokens representing the route.
+     */
+    static public function tokenize(string $route, $patterns = [], $defaults = []): array {
+
+        $params = []; // used to check for duplicate parameters
         $tokens = [];
         $curr_index = 0;
 
@@ -61,13 +84,20 @@ class RouteCompiler {
             $tokens[] = ['text' => substr($route, $curr_index)];
         }
 
-        return self::buildPattern(self::markOptionals($tokens));
+        return self::markOptionals($tokens);
     }
 
 
-    static public function buildPattern(array $tokens): string {
+    /**
+     * Compiles an array of route tokens into a regular expression pattern.
+     *
+     * @param array $tokens The array of route tokens.
+     * @return string The compiled regular expression pattern.
+     */
+    static public function compile(array $tokens): string {
         $closing_optionals = [];
         $pattern = '#^';
+        $getProps = itemGetter('separator', 'param', 'pattern');
 
         foreach($tokens as $token) {
 
@@ -76,9 +106,9 @@ class RouteCompiler {
                 continue;
             }
 
-            $separator = preg_quote($token['separator'], '#');
-            $param = $token['param'];
-            $param_pattern = $token['pattern'];
+            [$separator, $param, $param_pattern] = $getProps($token);
+
+            $separator = preg_quote($separator, '#');
 
             if (isset($token['optional'])) {
 

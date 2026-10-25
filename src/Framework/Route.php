@@ -14,11 +14,13 @@ class Route {
 
     public string $action;
 
-    public ?array $params;
+    public array $params = [];
 
-    public ?array $middleware;
+    public array $middleware = [];
 
-    public ?array $pattern;
+    public array $patterns = [];
+
+    public array $defaults = [];
 
 
     public function __construct(
@@ -54,9 +56,7 @@ class Route {
      * @return void
      */
     public function middleware(array $keys) {
-        $this->middleware ??= [];
         array_push($this->middleware, ...$keys);
-
         return $this;
     }
 
@@ -68,7 +68,7 @@ class Route {
      * @return $this
      */
     public function numeric(string $param) {
-        $this->pattern[$param] = '\d+';
+        $this->patterns[$param] = '\d+';
         return $this;
     }
 
@@ -80,7 +80,7 @@ class Route {
      * @return $this
      */
     public function alpha(string $param) {
-        $this->pattern[$param] = '[a-zA-Z]+';
+        $this->patterns[$param] = '[a-zA-Z]+';
         return $this;
     }
 
@@ -92,7 +92,7 @@ class Route {
      * @return $this
      */
     public function alphanumeric(string $param) {
-        $this->pattern[$param] = '[a-zA-Z0-9]+';
+        $this->patterns[$param] = '[a-zA-Z0-9]+';
         return $this;
     }
 
@@ -105,7 +105,21 @@ class Route {
      */
     public function pattern(array $patterns) {
         foreach ($patterns as $param => $pattern) {
-            $this->pattern[$param] = $pattern;
+            $this->patterns[$param] = $pattern;
+        }
+        return $this;
+    }
+
+
+    /**
+     * Sets default values for the route parameters.
+     *
+     * @param array $defaults An associative array of route parameters and their default values.
+     * @return $this
+     */
+    public function default(array $defaults) {
+        foreach ($defaults as $param => $value) {
+            $this->defaults[$param] = $value;
         }
         return $this;
     }
@@ -153,5 +167,16 @@ class Route {
         return $this->container->getMethodArguments(
             $this->getController(), $this->action, $this->params ?? []
         );
+    }
+
+
+    /**
+     * Compile a regex route pattern for the route.
+     *
+     * @return string The compiled regex pattern for the route.
+     */
+    public function compilePattern(): string {
+        $tokens = RouteCompiler::tokenize($this->uri, $this->patterns, $this->defaults);
+        return RouteCompiler::compile($tokens);
     }
 }

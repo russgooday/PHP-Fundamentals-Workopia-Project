@@ -110,7 +110,6 @@ class Router {
             if ($matched = $this->routeMatch($route, $uri)) {
 
                 $route->setParams($matched['params']);
-
                 return $route;
             }
         }
@@ -126,7 +125,6 @@ class Router {
      * @param string $uri The full URI or path to test.
      * @return array{params:array<string,string>}|null
      * @example routeMatch('/listings/{id}', '.../listings/23') -> ['params'=>['id'=>'23']]
-     * TODO: Cleanup this messy implementation.
      */
     public function routeMatch(Route $route, string $uri): ?array {
         $path = parse_url($uri, PHP_URL_PATH);
@@ -135,51 +133,14 @@ class Router {
             return null;
         }
 
-        $uri = $this->_normalisePath($path);
+        $uri = $this->normalisePath($path);
 
-        $route_parts = $this->_splitPathToParts($route->uri);
-        $uri_parts = $this->_splitPathToParts($uri);
-        $params = [];
-
-        // early exit if a different number of parts
-        if (count($uri_parts) !== count($route_parts)) return null;
-
-        foreach ($route_parts as $i => $route_part) {
-            $uri_part = $uri_parts[$i];
-
-            // we have found a matching literal
-            if ($route_part === $uri_part) {
-                continue;
-            }
-
-            // we have found a matching parameter
-            if (preg_match(self::PARAM_REGEX, $route_part, $matches)) {
-                $name = $matches[1];
-                $pattern = $route->pattern[$name] ?? null;
-
-                inspect($route);
-
-                if ($pattern && !preg_match("#^$pattern$#", $uri_part)) {
-                    return null;
-                }
-
-                $params[$name] = $uri_part;
-                continue;
-            }
-            // not a match, so exit with false
-            return null;
+        if (preg_match($route->compilePattern(), $uri, $matches)) {
+            $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+            return ['uri' => $uri, 'params' => $params];
         }
 
-        return ['uri' => $uri, 'params' => $params];
-    }
-
-    /**
-     * Split a path into parts,
-     * @param string $path The path to split, e.g. '/listings/123/edit'.
-     * @return array An array of path parts, e.g. ['listings', '123', 'edit'].
-     */
-    private function _splitPathToParts(string $path): array {
-        return explode('/', trim($path, '/'));
+        return null;
     }
 
 
@@ -188,7 +149,7 @@ class Router {
      * @param string $path The path to normalise.
      * @return string A path that always begins with '/'.
      */
-    private function _normalisePath(string $path): string {
+    private function normalisePath(string $path): string {
         return '/' . trim($path, '/');
     }
 }
