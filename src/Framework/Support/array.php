@@ -210,3 +210,43 @@ function insertSort(array $arr, callable $fn): array {
 
     return $arr;
 }
+
+
+/**
+ * Returns a callable that retrieves the value(s) associated with the specified key(s) from an array.
+ *
+ * @param string ...$keys The key(s) to retrieve.
+ * @return callable A function that takes an array and returns the value(s) for the specified key(s).
+ *
+ * @example
+ * itemGetter('x', 'z')['x' => 2, 'y' => 3, 'z' => 4] // [2, 4]
+ */
+function itemGetter(string ...$keys): callable {
+    if (count($keys) === 1) {
+
+        return function(array $arr) use ($keys): mixed {
+            if (!array_key_exists($keys[0], $arr)) {
+                throw new \LogicException("itemGetter: Key '{$keys[0]}' not found in array");
+            }
+
+            return $arr[$keys[0]];
+        };
+
+    } else {
+
+        return function(array $arr) use ($keys): array {
+            $values = [];
+
+            foreach ($keys as $key) {
+                if (!array_key_exists($key, $arr)) {
+                    throw new \LogicException("itemGetter: Key '$key' not found in array");
+                }
+
+                $values[] = $arr[$key];
+
+            }
+            return $values;
+        };
+
+    }
+}

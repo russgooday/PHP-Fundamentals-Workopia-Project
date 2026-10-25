@@ -2,26 +2,44 @@
 
 namespace Framework;
 
-class Router {
-    private const PARAM_REGEX = '#^\{([^:]+?)(?::(.*))?\}$#';
+use Framework\Container\Container;
 
-    private array $routes = [];
+class Router {
+    private const PARAM_REGEX = '#^\{([^}]+)\}$#'; // '#^\{([^:]+?)(?::(.*))?\}$#';
+
+    private array $routes = [
+        'GET' => [],
+        'POST' => [],
+        'PUT' => [],
+        'DELETE' => []
+    ];
+
+
+    public function __construct(
+        private Container $container
+    ){}
+
 
     /**
      * Register a route
      * @param string $method
      * @param string $uri
      * @param string $controller
-     * @return void
+     * @return Route A Route instance
      */
     public function registerRoute(
-        string $method, string $uri, string $controller
-    ): void {
-        $this->routes[] = [
-            'method' => $method,
-            'uri' => $uri,
-            'controller' => $controller,
-        ];
+        string $method,
+        string $uri,
+        string $controller
+    ): Route {
+        $route = new Route($method, $uri, $controller);
+
+        // add the route to the internal routes array
+        $this->routes[$method][] = $route;
+
+        $route->setContainer($this->container);
+
+        return $route;
     }
 
 
@@ -29,11 +47,10 @@ class Router {
      * Add a GET route
      * @param string $uri
      * @param string $controller
-     * @return self
+     * @return Route
      */
-    public function get(string $uri, string $controller): self {
-        $this->registerRoute('GET', $uri, $controller);
-        return $this;
+    public function get(string $uri, string $controller): Route {
+        return $this->registerRoute('GET', $uri, $controller);
     }
 
 
@@ -41,11 +58,10 @@ class Router {
      * Add a POST route
      * @param string $uri
      * @param string $controller
-     * @return self
+     * @return Route
      */
-    public function post(string $uri, string $controller): self {
-        $this->registerRoute('POST', $uri, $controller);
-        return $this;
+    public function post(string $uri, string $controller): Route {
+        return $this->registerRoute('POST', $uri, $controller);
     }
 
 
@@ -53,11 +69,10 @@ class Router {
      * Add a PUT route
      * @param string $uri
      * @param string $controller
-     * @return self
+     * @return Route
      */
-    public function put(string $uri, string $controller): self {
-        $this->registerRoute('PUT', $uri, $controller);
-        return $this;
+    public function put(string $uri, string $controller): Route {
+        return $this->registerRoute('PUT', $uri, $controller);
     }
 
 
@@ -65,24 +80,10 @@ class Router {
      * Add a DELETE route
      * @param string $uri
      * @param string $controller
-     * @return self
+     * @return Route
      */
-    public function delete(string $uri, string $controller): self {
-        $this->registerRoute('DELETE', $uri, $controller);
-        return $this;
-    }
-
-
-    /**
-     * Adds middleware to the last registered route.
-     * @param array $keys The middleware keys to associate with the route.
-     * @return self Returns the router instance for method chaining.
-     */
-    public function middleware(array $keys): self {
-        if (!empty($this->routes)) {
-            $this->routes[array_key_last($this->routes)]['middleware'] = $keys;
-        }
-        return $this;
+    public function delete(string $uri, string $controller): Route {
+        return $this->registerRoute('DELETE', $uri, $controller);
     }
 
 
@@ -92,7 +93,7 @@ class Router {
      * @return bool Returns true if there are routes for the method, false otherwise.
      */
     public function hasMethod(string $method): bool {
-        return in_array(strtoupper($method), ['GET', 'POST', 'PUT', 'DELETE']);
+        return array_key_exists(strtoupper($method), $this->routes);
     }
 
 
@@ -100,95 +101,46 @@ class Router {
      * Matches a URI against registered routes for the given HTTP method.
      * @param string $uri The request URI to match against registered routes.
      * @param string $method The HTTP method (e.g. 'GET', 'POST').
-     * @return array|false Returns an array with 'controller' and 'params' if
-     * a match is found, or false if no match is found.
+     * @return ?Route Returns a Route instance if a match is found, or null if no match is found.
      */
-    public function match(string $uri, string $method = 'GET'): array|false {
+    public function match(string $uri, string $method = 'GET'): ?Route {
         $method = strtoupper($method);
 
-        // check if method exists e.g. 'GET', 'POST', etc.
-        if (!$this->hasMethod($method)) {
-            return false;
-        }
+        foreach ($this->routes[$method] as $route) {
+            if ($matched = $this->routeMatch($route, $uri)) {
 
-        foreach ($this->routes as $route) {
-
-            if ($route['method'] !== $method) {
-                continue;
-            }
-
-            if ($matched = $this->routeMatch($route['uri'], $uri)) {
-
-                return [
-                    'controller' => $route['controller'],
-                    'params' => $matched['params'],
-                    'middleware' => $route['middleware'] ?? []
-                ];
+                $route->setParams($matched['params']);
+                return $route;
             }
         }
 
-        return false;
+        return null;
     }
 
 
     /**
      * Checks whether a URI matches a route template and if a match is found
      * returns named parameter values.
-     * @param string $route The route template, e.g. '/items/:id'.
+     * @param Route $route The route instance.
      * @param string $uri The full URI or path to test.
      * @return array{params:array<string,string>}|null
      * @example routeMatch('/listings/{id}', '.../listings/23') -> ['params'=>['id'=>'23']]
      */
-    public function routeMatch(string $route, string $uri): ?array {
+    public function routeMatch(Route $route, string $uri): ?array {
         $path = parse_url($uri, PHP_URL_PATH);
 
         if (!is_string($path)) {
             return null;
         }
 
-        $uri = $this->_normalisePath($path);
+        $uri = $this->normalisePath($path);
 
-        $route_parts = $this->_splitPathToParts($route);
-        $uri_parts = $this->_splitPathToParts($uri);
-        $params = [];
-
-        // early exit if a different number of parts
-        if (count($uri_parts) !== count($route_parts)) return null;
-
-        foreach ($route_parts as $i => $route_part) {
-            $uri_part = $uri_parts[$i];
-
-            // we have found a matching literal
-            if ($route_part === $uri_part) {
-                continue;
-            }
-
-            // we have found a matching parameter
-            if (preg_match(self::PARAM_REGEX, $route_part, $matches)) {
-                $name = $matches[1];
-                $regex = $matches[2] ?? null;
-
-                if ($regex && !preg_match("#^$regex$#", $uri_part)) {
-                    return null;
-                }
-
-                $params[$name] = $uri_part;
-                continue;
-            }
-            // not a match, so exit with false
-            return null;
+        if (preg_match($route->compilePattern(), $uri, $matches)) {
+            $params = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+            return ['uri' => $uri, 'params' => $params];
         }
 
-        return ['uri' => $uri, 'params' => $params];
-    }
-
-    /**
-     * Split a path into parts,
-     * @param string $path The path to split, e.g. '/listings/123/edit'.
-     * @return array An array of path parts, e.g. ['listings', '123', 'edit'].
-     */
-    private function _splitPathToParts(string $path): array {
-        return explode('/', trim($path, '/'));
+        return null;
     }
 
 
@@ -197,7 +149,7 @@ class Router {
      * @param string $path The path to normalise.
      * @return string A path that always begins with '/'.
      */
-    private function _normalisePath(string $path): string {
+    private function normalisePath(string $path): string {
         return '/' . trim($path, '/');
     }
 }
