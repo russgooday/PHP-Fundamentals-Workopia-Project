@@ -161,4 +161,14 @@ class ValidatorTest extends TestCase {
 
         $this->assertSame('hello', $validator->validated()['title']);
     }
+
+
+    public function testInputsAreSame(): void {
+        $validator = $this->makeValidator(
+            ['password' => 'password_123', 'password_confirmation' => 'password_123'],
+            ['password' => ['required'], 'password_confirmation' => ['required', 'same:password']]
+        );
+
+        $this->assertSame(true, $validator->validate());
+    }
 }

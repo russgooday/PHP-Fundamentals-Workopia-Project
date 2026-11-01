@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang='en'>
-<!-- ?= inspect (get_defined_vars()); ?> -->
 <?= $this->render('partials/head' , compact('title')); ?>
 
 <body class='bg-gray-100'>

@@ -2,6 +2,7 @@
 namespace Framework\Validation;
 
 class Validator {
+
     private array $primary_rules = [
         'sometimes',
         'required',
@@ -19,7 +20,6 @@ class Validator {
 
     private array $messages = [];
 
-    // Instance of ValidatorChecks to perform the actual validation logic.
     private ValidatorChecks $checks;
 
     /**
@@ -105,6 +105,7 @@ class Validator {
         $type = $this->getType($value, $rules);
 
         foreach ($this->sortRules($rules) as $rule) {
+
             [$rule, $args] = $this->parseRule($rule);
 
             if ($rule === 'sometimes') {
@@ -120,11 +121,9 @@ class Validator {
 
             // Determine if the rule is a size-related rule (e.g., 'min', 'max', 'between').
             if ($this->sizeRule($rule)) {
-
                 $result = $this->checks->$rule($value, $type, ...$args);
             } else {
-
-                $result = $this->checks->$rule($value, $args);
+                $result = $this->checks->$rule($value, ...$args);
             }
 
             if ($result === 'skip') {

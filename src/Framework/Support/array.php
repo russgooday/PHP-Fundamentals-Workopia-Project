@@ -180,6 +180,25 @@ if (!function_exists('array_is_list')) {
 
 
 /**
+ * Sorts an array by its keys using the insertion sort algorithm and a custom comparison function.
+ *
+ * @param array $arr The array to sort.
+ * @param callable $fn The comparison function for the keys,
+ * which should return a negative, zero, or positive value.
+ * @return array The array sorted by keys.
+ */
+function insertSortKeys(array $arr, callable $fn): array {
+    $sorted = [];
+
+    foreach(insertSort(array_keys($arr), $fn) as $key) {
+        $sorted[$key] = $arr[$key];
+    }
+
+    return $sorted;
+}
+
+
+/**
  * Sorts an array using the insertion sort algorithm and a custom comparison function.
  *
  * @param array $arr The array to sort.

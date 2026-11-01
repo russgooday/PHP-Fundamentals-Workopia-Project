@@ -2,9 +2,12 @@
 
 namespace Framework\Validation;
 
+/**
+ * @mixin \Framework\Validation\Validator
+ */
 class ValidatorChecks {
 
-    private function _getSize(mixed $value, string $type): int|float {
+    private function getSize(mixed $value, string $type): int|float {
         if ($type === 'numeric') {
             $float_value = toFloat($value);
 
@@ -19,54 +22,76 @@ class ValidatorChecks {
         return mb_strlen($value);
     }
 
-    private function _allowedKeys(array $arr, array $allowed_keys): bool {
+
+    private function allowedKeys(array $arr, array $allowed_keys): bool {
         return empty(array_diff(array_keys($arr), $allowed_keys));
     }
 
-    private function _empty(mixed $value): bool {
+
+
+    private function is_empty(mixed $value): bool {
         return ($value === null || $value === '' || $value === []);
     }
 
+
     public function required(mixed $value): ?string {
-        return ($this->_empty($value)) ? 'fail' : null;
+        return ($this->is_empty($value)) ? 'fail' : null;
     }
 
+
     public function nullable(mixed $value): ?string {
-        return ($this->_empty($value)) ? 'skip' : null;
+        return ($this->is_empty($value)) ? 'skip' : null;
     }
+
 
     public function string(mixed $value): ?string {
         return (is_string($value)) ? null : 'fail';
     }
 
+
     public function numeric(mixed $value): ?string {
         return (is_string($value) && !is_null(toFloat($value))) ? null : 'fail';
     }
 
+
     public function min(mixed $value, string $type, int|float $min): ?string {
-        return ($this->_getSize($value, $type) < $min) ? 'fail' : null;
+        return ($this->getSize($value, $type) < $min) ? 'fail' : null;
     }
+
 
     public function max(mixed $value, string $type, int|float $max): ?string {
-        return ($this->_getSize($value, $type) > $max) ? 'fail' : null;
+        return ($this->getSize($value, $type) > $max) ? 'fail' : null;
     }
 
+
     public function between(mixed $value, string $type, int|float $min, int|float $max): ?string {
-        $size = $this->_getSize($value, $type);
+        $size = $this->getSize($value, $type);
 
         return ($size < $min || $size > $max) ? 'fail' : null;
     }
+
 
     public function email(mixed $value): ?string {
         return (!filter_var($value, FILTER_VALIDATE_EMAIL)) ? 'fail' : null;
     }
 
-    public function array(mixed $arr, array $keys = []): ?string {
+
+    public function same(mixed $value, string $other): ?string {
+        if (array_key_exists($other, $this->data) && $value === $this->data[$other]) {
+            return null;
+        }
+
+        return 'fail';
+    }
+
+
+    public function array(mixed $arr, string ...$keys): ?string {
         if (is_array($arr)) {
-            if (empty($keys) || $this->_allowedKeys($arr, $keys)) {
+            if (empty($keys) || $this->allowedKeys($arr, $keys)) {
                 return null;
             }
         }
+
         return 'fail';
     }
 }
