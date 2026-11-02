@@ -2,9 +2,6 @@
 
 namespace Framework\Validation;
 
-/**
- * @mixin \Framework\Validation\Validator
- */
 class ValidatorChecks {
 
     private function getSize(mixed $value, string $type): int|float {
@@ -26,7 +23,6 @@ class ValidatorChecks {
     private function allowedKeys(array $arr, array $allowed_keys): bool {
         return empty(array_diff(array_keys($arr), $allowed_keys));
     }
-
 
 
     private function is_empty(mixed $value): bool {
@@ -54,18 +50,23 @@ class ValidatorChecks {
     }
 
 
-    public function min(mixed $value, string $type, int|float $min): ?string {
-        return ($this->getSize($value, $type) < $min) ? 'fail' : null;
+    public function min(mixed $value, Rule $rule): ?string {
+        $min = $rule->values[0];
+
+        return ($this->getSize($value, $rule->field_type) < $min) ? 'fail' : null;
     }
 
 
-    public function max(mixed $value, string $type, int|float $max): ?string {
-        return ($this->getSize($value, $type) > $max) ? 'fail' : null;
+    public function max(mixed $value, Rule $rule): ?string {
+        $max = $rule->values[0];
+
+        return ($this->getSize($value, $rule->field_type) > $max) ? 'fail' : null;
     }
 
 
-    public function between(mixed $value, string $type, int|float $min, int|float $max): ?string {
-        $size = $this->getSize($value, $type);
+    public function between(mixed $value, Rule $rule): ?string {
+        [$min, $max] = $rule->values;
+        $size = $this->getSize($value, $rule->field_type);
 
         return ($size < $min || $size > $max) ? 'fail' : null;
     }
@@ -76,8 +77,11 @@ class ValidatorChecks {
     }
 
 
-    public function same(mixed $value, string $other): ?string {
-        if (array_key_exists($other, $this->data) && $value === $this->data[$other]) {
+    public function same(mixed $value, Rule $rule): ?string {
+        $data = $rule->form_data;
+        $other = $rule->values[0];
+
+        if (array_key_exists($other, $data) && $value === $data[$other]) {
             return null;
         }
 
@@ -85,9 +89,9 @@ class ValidatorChecks {
     }
 
 
-    public function array(mixed $arr, string ...$keys): ?string {
+    public function array(mixed $arr, Rule $rule): ?string {
         if (is_array($arr)) {
-            if (empty($keys) || $this->allowedKeys($arr, $keys)) {
+            if (empty($rule->values) || $this->allowedKeys($arr, $rule->values)) {
                 return null;
             }
         }

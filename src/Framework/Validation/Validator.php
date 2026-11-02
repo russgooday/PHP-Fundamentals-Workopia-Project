@@ -86,7 +86,7 @@ class Validator {
      * skip or failure. If the field is missing from the data, only the
      * 'sometimes' and 'required' rules are applied.
      *
-     * @param string $name The field name.
+     * @param string $field_name The field name.
      * @param mixed $value The field's value, or null if it is missing.
      * @param array $rules The rule strings, e.g. ['required', 'between:3,10'].
      * @param bool $field_missing True if the field was not present in the data.
@@ -95,43 +95,39 @@ class Validator {
      *
      * @throws \Exception If a rule has no matching check method.
      */
-    private function validateField(string $name, mixed $value, array $rules, bool $field_missing): ?string {
+    private function validateField(string $field_name, mixed $value, array $rules, bool $field_missing): ?string {
 
         if ($field_missing) {
             // only include 'sometimes' and 'required' checks, if given.
             $rules = array_intersect($this->missing_rules, $rules);
         }
 
-        $type = $this->getType($value, $rules);
+        $field_type = $this->getType($value, $rules);
 
-        foreach ($this->sortRules($rules) as $rule) {
+        foreach ($this->sortRules($rules) as $rule_string) {
 
-            [$rule, $args] = $this->parseRule($rule);
+            $rule = new Rule($rule_string, $field_name, $field_type, $this->data);
+            $rule_attribute = $rule->attribute;
 
-            if ($rule === 'sometimes') {
+            if ($rule_attribute === 'sometimes') {
                 // if missing skip to next field check
                 if ($field_missing) return null;
                 // otherwise skip to next rule
                 continue;
             }
 
-            if (!method_exists($this->checks, $rule)) {
-                throw new \Exception("Validation rule '$rule' does not exist.");
+            if (!is_callable([$this->checks, $rule_attribute])) {
+                throw new \Exception("Validation rule '$rule_attribute' does not exist.");
             }
 
-            // Determine if the rule is a size-related rule (e.g., 'min', 'max', 'between').
-            if ($this->sizeRule($rule)) {
-                $result = $this->checks->$rule($value, $type, ...$args);
-            } else {
-                $result = $this->checks->$rule($value, ...$args);
-            }
+            $result = $this->checks->$rule_attribute($value, $rule);
 
             if ($result === 'skip') {
                 return null;
             }
 
             if ($result === 'fail') {
-                return $this->getMessage($rule, $name, $type, $args);
+                return $this->getMessage($rule);
             }
         }
 
@@ -150,38 +146,12 @@ class Validator {
     private function sortRules(array $rules) {
         // flip -> ['required' => 0, 'string' => 1]
         $rank = array_flip($this->primary_rules);
+        $max = PHP_INT_MAX;
 
+        // fn($a, $b) => ($rank[strtok($a, ':')] ?? $max) <=> ($rank[strtok($b, ':')] ?? $max)
         return insertSort($rules, fn($a, $b) =>
-            ($rank[$a] ?? PHP_INT_MAX) <=> ($rank[$b] ?? PHP_INT_MAX)
+            ($rank[strtok($a, ':')] ?? $max) <=> ($rank[strtok($b, ':')] ?? $max)
         );
-    }
-
-
-    /**
-     * Splits a rule string into its name and comma-separated arguments.
-     *
-     * @param string $rule The rule string, e.g. 'between:3,10'.
-     * @return array A [name, args] pair, e.g. ['between', ['3', '10']].
-     */
-    private function parseRule(string $rule) {
-        [$rule, $args] = array_pad(explode(':', $rule), 2, []);
-
-        if (is_string($args)) {
-            $args = explode(',', $args);
-        }
-
-        return [$rule, $args];
-    }
-
-
-    /**
-     * Checks if a rule is a size-related rule (e.g., 'min', 'max', 'between').
-     *
-     * @param string $rule The name of the rule to check.
-     * @return bool True if the rule is size-related, false otherwise.
-     */
-    private function sizeRule(string $rule): bool {
-        return in_array($rule, $this->size_rules);
     }
 
 
@@ -203,28 +173,28 @@ class Validator {
 
 
     /**
-     * Builds the error message for a failed rule, choosing the numeric or string
-     * variant for size rules (min, max, between) based on whether the field
-     * also has a numeric rule.
+     * Builds the error message for a failed rule.
      *
-     * @param string $rule The name of the rule that failed.
-     * @param string $name The field name.
-     * @param string $type The type of the field value
-     * @param array ...$args The rule's arguments, e.g. min/max values.
+     * @param Rule $rule The rule object.
      *
      * @return string The formatted error message.
      */
-    private function getMessage(string $rule, string $name, string $type, array $args): string {
-        $message = $this->messages[$rule] ?? null;
+    private function getMessage(Rule $rule): string {
 
-        // size rules hold a message per data type, e.g. ['numeric' => fn, 'string' => fn]
-        if ($this->sizeRule($rule) && is_array($message)) {
-            $message = $message[$type] ?? null;
+        if (isset($this->messages[$rule->attribute])) {
+
+            $message = $this->messages[$rule->attribute];
+
+            if (is_array($message) && isset($message[$rule->field_type])) {
+                $message = $message[$rule->field_type];
+            }
+
+            if (is_callable($message)) {
+                return $message($rule->field_name, ...$rule->values);
+            }
         }
 
-        return is_callable($message)
-            ? $message($name, ...$args)
-            : $this->messages['default']($name);
+        return $this->messages['default']($rule->field_name);
     }
 
 
