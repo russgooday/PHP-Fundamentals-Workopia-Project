@@ -171,4 +171,17 @@ class ValidatorTest extends TestCase {
 
         $this->assertSame(true, $validator->validate());
     }
+
+    public function testErrorMessageForSameNamesBothFields(): void {
+        $validator = $this->makeValidator(
+            ['password' => 'password_123', 'password_confirmation' => 'password_456'],
+            ['password' => ['required'], 'password_confirmation' => ['required', 'same:password']]
+        );
+        $validator->validate();
+
+        $this->assertSame(
+            'The password_confirmation field must match the password field.',
+            $validator->getErrors()['password_confirmation']
+        );
+    }
 }

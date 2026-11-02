@@ -29,6 +29,6 @@ return [
     ],
     'array' => fn(string $name) => "The {$name} field contains invalid keys.",
     'email' => fn(string $name) => "The {$name} field must be a valid email.",
-    'same' => fn(string $name) => "The {$name} field must match the other field.",
+    'same' => fn(string $name, string $other) => "The {$name} field must match the {$other} field.",
     'default' => fn(string $name) => "The {$name} field is invalid."
 ];
