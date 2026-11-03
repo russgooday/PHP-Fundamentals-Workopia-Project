@@ -7,17 +7,16 @@ use Framework\Exceptions\HttpException,
     Framework\Session;
 
 use App\Models\Users,
-    App\FormRequests\UserFormRequest;
+    App\FormRequests\LoginRequest,
+    App\FormRequests\RegisterRequest;
 
 
 class UserController extends Controller {
 
     public function __construct(
         private Users $users,
-        private UserFormRequest $formRequest,
         private Session $session
     ) {}
-
 
     /**
      * Display the user registration form.

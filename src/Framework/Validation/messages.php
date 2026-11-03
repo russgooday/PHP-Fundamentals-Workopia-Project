@@ -28,7 +28,16 @@ return [
         )
     ],
     'array' => fn(string $name) => "The {$name} field contains invalid keys.",
+
     'email' => fn(string $name) => "The {$name} field must be a valid email.",
+
     'same' => fn(string $name, string $other) => "The {$name} field must match the {$other} field.",
+
+    'pattern' => fn(string $name) => "The {$name} field format is invalid.",
+
+    'password' => fn(string $name) => (
+        "The {$name} field must contain at least 1 uppercase, 1 lowercase, 1 number, and 1 symbol."
+    ),
+
     'default' => fn(string $name) => "The {$name} field is invalid."
 ];

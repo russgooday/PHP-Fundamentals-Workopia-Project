@@ -4,6 +4,16 @@ namespace Framework\Validation;
 
 class ValidatorChecks {
 
+    const PASSWORD =
+    '^'
+    . '(?=.*[A-Z])' // at least 1 uppercase letter
+    . '(?=.*[a-z])' // at least 1 lowercase letter
+    . '(?=.*[0-9])' // at least 1 number
+    . '(?=.*[-@_$!%*?&])' // at least 1 symbol
+    . '[-A-Za-z0-9@_$!%*?&]+'
+    .'$';
+
+
     private function getSize(mixed $value, string $type): int|float {
         if ($type === 'numeric') {
             $float_value = toFloat($value);
@@ -50,6 +60,11 @@ class ValidatorChecks {
     }
 
 
+    public function password(mixed $value): ?string {
+        return (preg_match("#" . self::PASSWORD . "#", $value)) ? null : 'fail';
+    }
+
+
     public function min(mixed $value, Rule $rule): ?string {
         $min = $rule->values[0];
 
@@ -86,6 +101,13 @@ class ValidatorChecks {
         }
 
         return 'fail';
+    }
+
+
+    public function pattern(mixed $value, Rule $rule): ?string {
+        $pattern = $rule->values[0];
+
+        return (preg_match("#$pattern#", $value)) ? null : 'fail';
     }
 
 

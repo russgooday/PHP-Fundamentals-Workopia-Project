@@ -17,7 +17,11 @@ abstract class FormRequest {
     protected array $sanitize_overrides = [];
 
     public function __construct(protected Request $request) {
-        $this->validator = new Validator($request->post, $this->rules, $this->messages);
+        $this->validator = new Validator(
+            $request->post,
+            $this->rules,
+            $this->messages()
+        );
     }
 
     public function validate(): bool {
@@ -30,6 +34,10 @@ abstract class FormRequest {
 
     public function validated(): array {
         return $this->validator->validated();
+    }
+
+    public function messages(): array {
+        return $this->messages;
     }
 
     public function sanitized(): array {

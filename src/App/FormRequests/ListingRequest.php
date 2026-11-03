@@ -4,7 +4,7 @@ namespace App\FormRequests;
 
 use Framework\FormRequest;
 
-class ListingsFormRequest extends FormRequest {
+class ListingRequest extends FormRequest {
 
     protected array $rules = [
         'title'         => ['required', 'max:255'],

@@ -181,9 +181,11 @@ class Validator {
      */
     private function getMessage(Rule $rule): string {
 
-        if (isset($this->messages[$rule->attribute])) {
+        $message = $this->messages["{$rule->field_name}.{$rule->attribute}"]
+            ?? $this->messages[$rule->attribute]
+            ?? null;
 
-            $message = $this->messages[$rule->attribute];
+        if ($message !== null) {
 
             if (is_array($message) && isset($message[$rule->field_type])) {
                 $message = $message[$rule->field_type];

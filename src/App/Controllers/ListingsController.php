@@ -6,14 +6,13 @@ use Framework\Exceptions\HttpException,
     Framework\Response,
     Framework\Session,
 
-    App\FormRequests\ListingsFormRequest,
+    App\FormRequests\ListingRequest,
     App\Models\Listings;
 
 class ListingsController extends Controller {
 
     public function __construct(
         private Listings $listings,
-        private ListingsFormRequest $formRequest,
         private Session $session
     ) {}
 
@@ -79,12 +78,11 @@ class ListingsController extends Controller {
      *
      * @return Response
      */
-    public function store(): Response {
-        $formRequest = $this->formRequest;
+    public function store(ListingRequest $form): Response {
 
-        if ($formRequest->validate()) {
+        if ($form->validate()) {
 
-            $listing = $formRequest->sanitized();
+            $listing = $form->sanitized();
             $listing['user_id'] = 1; // temporary user ID for testing
 
             if ($this->listings->create($listing)) {
@@ -104,7 +102,7 @@ class ListingsController extends Controller {
             return $this->view(
                 'listings/create',
                 [
-                    'errors' => $formRequest->getErrors(),
+                    'errors' => $form->getErrors(),
                     'job' => (object) $this->request->post
                 ]
             );
@@ -118,17 +116,15 @@ class ListingsController extends Controller {
      * @param int $job_id
      * @return Response
      */
-    public function update(int $job_id): Response {
+    public function update(int $job_id, ListingRequest $form): Response {
 
         if (!$this->listings->findOne($job_id)) {
             throw new HttpException(404, "Sorry, that job doesn't exist", '/listings');
         }
 
-        $formRequest = $this->formRequest;
+        if ($form->validate()) {
 
-        if ($formRequest->validate()) {
-
-            $listing = $formRequest->sanitized();
+            $listing = $form->sanitized();
             $listing['user_id'] = 1; // temporary user ID for testing
 
             if ($this->listings->update($job_id, $listing)) {
@@ -143,7 +139,7 @@ class ListingsController extends Controller {
         } else {
 
             $post_data = $this->request->post;
-            $errors = $formRequest->getErrors();
+            $errors = $form->getErrors();
 
             return $this->view(
                 'listings/create',

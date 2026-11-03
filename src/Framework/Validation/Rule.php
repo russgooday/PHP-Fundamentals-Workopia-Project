@@ -15,9 +15,11 @@ readonly class Rule {
     }
 
     private function parseRule(string $rule) {
-        [$attribute, $values] = array_pad(explode(':', $rule), 2, []);
+        [$attribute, $values] = array_pad(explode(':', $rule, 2), 2, []);
 
-        if (is_string($values)) $values = explode(',', $values);
+        if (is_string($values)) {
+            $values = ($attribute === 'pattern') ? [$values] : explode(',', $values);
+        }
 
         return [$attribute, $values];
     }

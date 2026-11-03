@@ -66,6 +66,21 @@ class ValidatorTest extends TestCase {
             'email: invalid'                    => [['email'], ['field' => 'not-an-email'], false],
             'email: array rejected'             => [['email'], ['field' => ['a', 'b']], false],
 
+            // password
+            'password: valid'                   => [['password'], ['field' => 'Valid1@pass'], true ],
+            'password: no uppercase'            => [['password'], ['field' => 'valid1@pass'], false],
+            'password: no lowercase'            => [['password'], ['field' => 'VALID1@PASS'], false],
+            'password: no number'               => [['password'], ['field' => 'Valid@pass'],  false],
+            'password: no symbol'               => [['password'], ['field' => 'Valid1pass'],  false],
+            'password: disallowed character'    => [['password'], ['field' => 'Valid1@ pass'], false],
+
+            // pattern (commas and colons must survive rule parsing)
+            'pattern: match'                    => [['pattern:^[a-z]+$'],       ['field' => 'abc'],   true ],
+            'pattern: no match'                 => [['pattern:^[a-z]+$'],       ['field' => 'abc1'],  false],
+            'pattern: comma kept intact'        => [['pattern:^a{2,3}$'],       ['field' => 'aaa'],   true ],
+            'pattern: colon kept intact'        => [['pattern:^\d{2}:\d{2}$'],  ['field' => '12:30'], true ],
+            'pattern: colon pattern no match'   => [['pattern:^\d{2}:\d{2}$'],  ['field' => '12'],    false],
+
             // size rules: strings measure characters
             'max string: at limit'              => [['string', 'max:5'],  ['field' => 'hello'],   true ],
             'max string: over limit'            => [['string', 'max:5'],  ['field' => 'hello!'],  false],
@@ -119,6 +134,34 @@ class ValidatorTest extends TestCase {
         $validator->validate();
 
         $this->assertSame('The salary field must be at most 10.', $validator->getErrors()['salary']);
+    }
+
+    public function testErrorMessageForPassword(): void {
+        $validator = $this->makeValidator(['password' => 'weakpass'], ['password' => ['password']]);
+        $validator->validate();
+
+        $this->assertSame(
+            'The password field must contain at least 1 uppercase, 1 lowercase, 1 number, and 1 symbol.',
+            $validator->getErrors()['password']
+        );
+    }
+
+    public function testErrorMessageForPattern(): void {
+        $validator = $this->makeValidator(['code' => 'abc1'], ['code' => ['pattern:^[a-z]+$']]);
+        $validator->validate();
+
+        $this->assertSame('The code field format is invalid.', $validator->getErrors()['code']);
+    }
+
+    public function testCustomMessageOverridesDefault(): void {
+        $validator = new Validator(
+            ['code' => 'abc1'],
+            ['code' => ['pattern:^[a-z]+$']],
+            ['code.pattern' => fn() => 'Lowercase letters only.']
+        );
+        $validator->validate();
+
+        $this->assertSame('Lowercase letters only.', $validator->getErrors()['code']);
     }
 
     public function testOnlyFirstFailingRuleIsReported(): void {
