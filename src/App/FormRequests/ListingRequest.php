@@ -21,5 +21,5 @@ class ListingRequest extends FormRequest {
         'benefits'      => ['nullable', 'max:1000']
     ];
 
-    protected array $sanitize_overrides = ['salary' => 'toFloat'];
+    protected array $sanitize = ['salary' => 'toFloat'];
 }

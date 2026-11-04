@@ -11,6 +11,23 @@ class Autoloader implements Stringable {
     }
 
 
+    /**
+     * Manually includes a non-class file (like global helper functions).
+     *
+     * @param string $path Relative or absolute path to the file.
+     * @return self - chainable
+     */
+    public function loadFile(string $path): self {
+        // Build path relative to the autoloader file's directory
+        $root = str_replace("\\", "/", __DIR__);
+        $filename = "{$root}/" . ltrim($path, '/');
+
+        $this->requireFile($filename);
+
+        return $this;
+    }
+
+
     protected function loader(string $class) {
         static $root = str_replace("\\", "/", __DIR__);
 

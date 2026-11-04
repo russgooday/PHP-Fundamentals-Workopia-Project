@@ -13,7 +13,7 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <?=
                     (!empty($listings))
-                        ? $this->renderForEach('partials/job-listing', $listings, 'job')
+                        ? $this->renderForEach('listings/partials/job-listing', $listings, 'job')
                         : '<p>Sorry, no listings to show you.</p>';
                 ?>
             </div>

@@ -14,7 +14,7 @@ abstract class FormRequest {
     protected array $messages = [];
 
     // Array of callbacks to override default sanitization for specific fields.
-    protected array $sanitize_overrides = [];
+    protected array $sanitize = [];
 
     public function __construct(protected Request $request) {
         $this->validator = new Validator(
@@ -40,11 +40,15 @@ abstract class FormRequest {
         return $this->messages;
     }
 
+    public function sanitize(): array {
+        return $this->sanitize;
+    }
+
     public function sanitized(): array {
         // TODO: currently only handles strings
 
         $data = $this->validated();
-        $overrides = $this->sanitize_overrides;
+        $overrides = $this->sanitize();
 
         foreach ($data as $key => $value) {
 
@@ -62,5 +66,10 @@ abstract class FormRequest {
         }
 
         return $data;
+    }
+
+    public function jsonSerialize(): mixed {
+        // Return an array of all properties you want encoded
+        return get_object_vars($this);
     }
 }

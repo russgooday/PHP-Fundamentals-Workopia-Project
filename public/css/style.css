@@ -1011,6 +1011,10 @@ video {
   outline-offset: 2px;
 }
 
+.select-none {
+  user-select: none;
+}
+
 @media (min-width: 768px) {
   .md\:mx-auto {
     margin-left: auto;

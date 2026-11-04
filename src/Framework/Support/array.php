@@ -1,5 +1,28 @@
 <?php
 
+if (!function_exists('pick')) {
+    /**
+     * Returns a function that picks specified keys from an array.
+     *
+     * @param string ...$keys The keys to pick from the array.
+     * @return callable A function that takes an array and returns an array with only the specified keys.
+     */
+    function pick(mixed ...$keys): callable {
+
+        return function(array $arr) use ($keys): array {
+            $picked = [];
+
+            foreach ($keys as $key) {
+                if (array_key_exists($key, $arr)) {
+                    $picked[$key] = $arr[$key];
+                }
+            }
+
+            return $picked;
+        };
+    }
+}
+
 /**
  * Reduces an array to a single value using a callback function.
  * Unlike the built-in array_reduce if no initial value is provided,

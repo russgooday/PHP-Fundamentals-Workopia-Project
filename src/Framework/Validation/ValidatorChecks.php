@@ -15,18 +15,25 @@ class ValidatorChecks {
 
 
     private function getSize(mixed $value, string $type): int|float {
-        if ($type === 'numeric') {
-            $float_value = toFloat($value);
 
-            if (is_numeric($float_value)) {
-                return $float_value;
-            }
-
-        } elseif ($type === 'array') {
+        if (is_array($value)) {
             return count($value);
         }
 
-        return mb_strlen($value);
+        if (is_string($value)) {
+
+            if ($type === 'numeric') {
+                $float_value = toFloat($value);
+
+                if (is_numeric($float_value)) {
+                    return $float_value;
+                }
+            }
+
+            return mb_strlen($value);
+        }
+
+        return 0;
     }
 
 
@@ -61,7 +68,7 @@ class ValidatorChecks {
 
 
     public function password(mixed $value): ?string {
-        return (preg_match("#" . self::PASSWORD . "#", $value)) ? null : 'fail';
+        return (is_string($value) && preg_match("#" . self::PASSWORD . "#", $value)) ? null : 'fail';
     }
 
 
@@ -107,7 +114,7 @@ class ValidatorChecks {
     public function pattern(mixed $value, Rule $rule): ?string {
         $pattern = $rule->values[0];
 
-        return (preg_match("#$pattern#", $value)) ? null : 'fail';
+        return (is_string($value) && preg_match("#$pattern#", $value)) ? null : 'fail';
     }
 
 

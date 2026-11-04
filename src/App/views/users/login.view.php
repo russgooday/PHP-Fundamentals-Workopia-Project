@@ -13,6 +13,7 @@
         <div class='message bg-green-100 p-3 my-3'>
           This is a success message.
         </div> -->
+            <?= $this->render('partials/message', ['message' => $session->getMessage('message')]); ?>
             <form method='POST' action='/auth/login'>
                 <input type='hidden' name='_token' value='<?= e($session->csrfToken()) ?>'>
                 <div class='mb-4'>

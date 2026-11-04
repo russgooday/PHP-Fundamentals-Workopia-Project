@@ -29,6 +29,7 @@ class PHPViewer implements ViewerInterface {
 
 
     public function render(string $view, array $data = []): string {
+        // TODO: consider relative paths for views
         $path = Paths::VIEWS . "/$view.view.php";
 
         if (!is_file($path)) {

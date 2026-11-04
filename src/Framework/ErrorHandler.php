@@ -31,6 +31,12 @@ class ErrorHandler {
             return;
         }
 
+        // Log deprecations and carry on, throw everything else
+        if ($errno === E_DEPRECATED || $errno === E_USER_DEPRECATED) {
+            $this->logError(new \ErrorException($message, 0, $errno, $file, $line));
+            return;
+        }
+
         throw new \ErrorException($message, 0, $errno, $file, $line);
     }
 

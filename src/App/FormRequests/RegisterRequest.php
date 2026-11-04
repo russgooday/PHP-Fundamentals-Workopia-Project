@@ -30,7 +30,17 @@ class RegisterRequest extends FormRequest {
             'password.pattern' => fn() => (
                 'The password must be 8 to 25 characters and contain at '
                 . 'least 1 uppercase, 1 lowercase, 1 number, and 1 symbol.'
+            ),
+            'password_confirmation.same' => fn() => (
+                'The password confirmation must match the password.'
             )
+        ];
+    }
+
+
+    public function sanitize(): array {
+        return [
+            'password' => fn($value) => password_hash($value, PASSWORD_DEFAULT)
         ];
     }
 }

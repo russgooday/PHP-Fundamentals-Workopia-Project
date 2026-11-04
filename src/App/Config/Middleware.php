@@ -8,13 +8,11 @@ class Middleware {
             // Global middlewares executed on every single request
             'global' => [
                 \App\Middleware\CrossSite::class,
-                \App\Middleware\ChangeResponse::class
+                \App\Middleware\TrimNullify::class
             ],
 
             // Route aliases for specific route endpoints
-            'aliases' => [
-                'example' => \App\Middleware\HomeViewResponse::class,
-            ]
+            'aliases' => []
         ];
     }
 }

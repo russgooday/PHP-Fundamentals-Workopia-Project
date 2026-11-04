@@ -31,7 +31,7 @@ class ValidatorTest extends TestCase {
             // required
             'required: missing key'             => [['required'], [],                       false],
             'required: empty string'            => [['required'], ['field' => ''],          false],
-            'required: whitespace is trimmed'   => [['required'], ['field' => '   '],       false],
+            'required: null value'              => [['required'], ['field' => null],        false],
             'required: "0" counts as present'   => [['required'], ['field' => '0'],         true ],
             'required: value present'           => [['required'], ['field' => 'x'],         true ],
 
@@ -73,6 +73,8 @@ class ValidatorTest extends TestCase {
             'password: no number'               => [['password'], ['field' => 'Valid@pass'],  false],
             'password: no symbol'               => [['password'], ['field' => 'Valid1pass'],  false],
             'password: disallowed character'    => [['password'], ['field' => 'Valid1@ pass'], false],
+            'password: null rejected'           => [['password'], ['field' => null],          false],
+            'password: array rejected'          => [['password'], ['field' => ['x']],         false],
 
             // pattern (commas and colons must survive rule parsing)
             'pattern: match'                    => [['pattern:^[a-z]+$'],       ['field' => 'abc'],   true ],
@@ -80,6 +82,8 @@ class ValidatorTest extends TestCase {
             'pattern: comma kept intact'        => [['pattern:^a{2,3}$'],       ['field' => 'aaa'],   true ],
             'pattern: colon kept intact'        => [['pattern:^\d{2}:\d{2}$'],  ['field' => '12:30'], true ],
             'pattern: colon pattern no match'   => [['pattern:^\d{2}:\d{2}$'],  ['field' => '12'],    false],
+            'pattern: null rejected'            => [['pattern:^[a-z]+$'],       ['field' => null],    false],
+            'pattern: array rejected'           => [['pattern:^[a-z]+$'],       ['field' => ['x']],   false],
 
             // size rules: strings measure characters
             'max string: at limit'              => [['string', 'max:5'],  ['field' => 'hello'],   true ],
@@ -101,6 +105,11 @@ class ValidatorTest extends TestCase {
             'min: missing field'                => [['min:3'],           [], true],
             'between: missing field'            => [['between:2,4'],     [], true],
             'max numeric: missing field'        => [['numeric', 'max:10'], [], true],
+
+            // size rules on a null value (no required/nullable): null measures as 0
+            'max: null value'                   => [['max:5'],       ['field' => null], true ],
+            'min: null value'                   => [['min:3'],       ['field' => null], false],
+            'between: null value'               => [['between:2,4'], ['field' => null], false],
         ];
     }
 
@@ -197,14 +206,6 @@ class ValidatorTest extends TestCase {
 
         $this->assertSame(['title' => 'x'], $validator->validated());
     }
-
-    public function testStringsAreTrimmed(): void {
-        $validator = $this->makeValidator(['title' => '  hello  '], ['title' => ['required']]);
-        $validator->validate();
-
-        $this->assertSame('hello', $validator->validated()['title']);
-    }
-
 
     public function testInputsAreSame(): void {
         $validator = $this->makeValidator(

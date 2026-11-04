@@ -28,36 +28,14 @@ class Validator {
      * @param array $custom_messages Custom error messages, to add to the default messages.
      */
     public function __construct(
-        private array $data,
+        private readonly array $data,
         private array $rules,
         private array $custom_messages = []
     ) {
         $this->checks = new ValidatorChecks();
-        $this->data = $this->trimStrings($data);
         $this->messages = $this->loadMessages('messages.php', $custom_messages);
     }
 
-
-    /**
-     * Trims all string values in the given data array,
-     * optionally excluding certain keys.
-     *
-     * @param array $data The data array to trim.
-     * @param array $exclude The keys to exclude from trimming.
-     * @return array The trimmed data array.
-     */
-    public function trimStrings(array $data, array $exclude = []): array {
-        $exclude = array_flip($exclude);
-        $trimmed = $data;
-
-        foreach($data as $key => $value) {
-            if (is_string($value) && !isset($exclude[$key])) {
-                $trimmed[$key] = trim($value);
-            }
-        }
-
-        return $trimmed;
-    }
 
     /**
      * Validates the data against the rules, collecting an error for each failing field.

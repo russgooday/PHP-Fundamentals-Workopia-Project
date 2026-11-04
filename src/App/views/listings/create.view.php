@@ -20,11 +20,8 @@
                 <?php endif; ?>
 
                 <h2 class='text-2xl font-bold mb-6 text-center text-gray-500'>Job Info</h2>
-                <?php if (isset($errors) && !empty($errors)): ?>
-                    <?php foreach ($errors as $error): ?>
-                        <div class='message bg-red-100 p-3 my-3'><?= e($error) ?></div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                <!-- Display form errors -->
+                <?= $this->render('partials/form-errors', ['errors' => $errors ?? []]); ?>
                 <div class='mb-4'>
                     <input
                         type='text'
@@ -100,12 +97,13 @@
                 </div>
                 <div class='mb-4'>
                     <input
-                        type='text'
+                        list='states'
                         name='state'
                         placeholder='State'
                         class='w-full px-4 py-2 border rounded focus:outline-none'
                         value='<?= e($job->state ?? '') ?>'
                     />
+                    <?= $this->render('partials/states-list'); ?>
                 </div>
                 <div class='mb-4'>
                     <input
