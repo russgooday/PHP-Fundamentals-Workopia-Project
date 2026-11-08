@@ -44,4 +44,11 @@ class Request {
 
         return $this->method;
     }
+
+
+    public function input(string $key, mixed $default = null): mixed {
+        $input = $this->post + $this->get;
+        // null may be a valid value, so we use array_key_exists instead chaining ??.
+        return array_key_exists($key, $input) ? $input[$key] : $default;
+    }
 }

@@ -14,6 +14,9 @@ class ValidatorChecks {
     .'$';
 
 
+    public function __construct(private Model\Validations $validations){}
+
+
     private function getSize(mixed $value, string $type): int|float {
 
         if (is_array($value)) {
@@ -108,6 +111,14 @@ class ValidatorChecks {
         }
 
         return 'fail';
+    }
+
+
+    public function unique(mixed $value, Rule $rule): ?string {
+        $table = $rule->values[0];
+        $column = $rule->values[1] ?? $rule->field_name;
+
+        return ($this->validations->exists($table, $column, $value)) ? 'fail' : null;
     }
 
 

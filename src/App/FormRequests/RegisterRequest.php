@@ -17,20 +17,25 @@ class RegisterRequest extends FormRequest {
 
     protected array $rules = [
         'name'                  => ['required', 'max:255'],
-        'email'                 => ['required', 'email', 'max:45'],
+        'email'                 => ['required', 'email', 'max:45', 'unique:users'],
         'city'                  => ['required', 'max:255'],
         'state'                 => ['required', 'max:255'],
         'password'              => ['required', 'pattern:' . self::PASSWORD],
         'password_confirmation' => ['required', 'same:password']
     ];
 
-
+    // custom error messages for validation rules
     public function messages(): array {
         return [
+            'email.unique' => fn() => (
+                'User with this email already exists.'
+            ),
+
             'password.pattern' => fn() => (
                 'The password must be 8 to 25 characters and contain at '
                 . 'least 1 uppercase, 1 lowercase, 1 number, and 1 symbol.'
             ),
+
             'password_confirmation.same' => fn() => (
                 'The password confirmation must match the password.'
             )

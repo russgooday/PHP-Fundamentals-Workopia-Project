@@ -3,6 +3,7 @@
 namespace Framework;
 
 use Framework\Validation\Validator;
+use Framework\Validation\ValidatorFactory;
 
 abstract class FormRequest {
     protected Validator $validator;
@@ -16,12 +17,24 @@ abstract class FormRequest {
     // Array of callbacks to override default sanitization for specific fields.
     protected array $sanitize = [];
 
-    public function __construct(protected Request $request) {
-        $this->validator = new Validator(
-            $request->post,
-            $this->rules,
+    public function __construct(
+        protected Request $request,
+        protected ValidatorFactory $factory
+    ) {
+        $this->validator = $factory->make(
+            $this->data(),
+            $this->rules(),
             $this->messages()
         );
+    }
+
+    // Allows subclasses to override the data to be validated.
+    public function data(): array {
+        return $this->request->post;
+    }
+
+    public function rules(): array {
+        return $this->rules;
     }
 
     public function validate(): bool {

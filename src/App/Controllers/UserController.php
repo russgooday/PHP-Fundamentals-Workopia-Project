@@ -47,20 +47,7 @@ class UserController extends Controller {
 
     public function store(RegisterRequest $form) {
         if ($form->validate()) {
-
-            $form_data = $form->sanitized();
-            $params = ['email' => $form_data['email']];
-
-            $user = $this->users->query('SELECT * FROM users WHERE email = :email', $params);
-
-            if ($user = $user->fetch()) {
-                // user already exists
-                $this->session->error('User with this email already exists.');
-
-                return $this->redirect('/auth/register');
-            }
-
-            $this->users->create($form_data);
+            $this->users->create($form->sanitized());
 
             $this->session->success('User successfully registered.');
 

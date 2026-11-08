@@ -65,9 +65,7 @@ class ContainerTest extends TestCase
     public function test_throws_when_constructor_params_are_builtins(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageIs(
-            "Unable to resolve Fixtures\UnresolvableClass's constructor parameter 'host' without a resolvable type."
-        );
+        $this->expectExceptionMessageIs("Unable to resolve parameter 'host'.");
         $this->container->get(UnresolvableClass::class);
     }
 
@@ -263,7 +261,7 @@ class ContainerTest extends TestCase
     public function test_method_arguments_throw_when_required_param_missing(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessageIs("Missing required parameter 'id'.");
+        $this->expectExceptionMessageIs("Unable to resolve parameter 'id'.");
 
         $this->container->getMethodArguments(new ArgsController(), 'needsId', []);
     }

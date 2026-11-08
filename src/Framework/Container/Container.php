@@ -73,17 +73,8 @@ class Container implements ArrayAccess {
             }
 
             if ($params = $reflectionClass->getConstructor()?->getParameters()) {
-
                 foreach ($params as $param) {
-                    if ($param_name = $this->getResolvable($param)) {
-
-                        $args[] = $this->get($param_name);
-                    } else {
-
-                        throw new InvalidArgumentException(
-                            "Unable to resolve {$name}'s constructor parameter '{$param->getName()}' without a resolvable type."
-                        );
-                    }
+                    $args[] = $this->getParamValue($param);
                 }
             }
 
@@ -103,20 +94,6 @@ class Container implements ArrayAccess {
     }
 
 
-
-    /**
-     * Get the class or interface name the container can resolve for a parameter.
-     * Returns null when the parameter has no type hint, is a union/intersection
-     * type, or is a built-in type (int, string, array, etc.).
-     *
-     * @param ReflectionParameter $param The constructor parameter to inspect.
-     * @return string|null The type name to resolve, or null if it can't be autowired.
-     */
-    private function getResolvable(ReflectionParameter $param): ?String {
-        $type = $param->getType();
-        return (isSingleType($type) && !$type->isBuiltin()) ? $type->getName() : null;
-    }
-
     /**
      * Gets the parameter names from the controller method and uses them
      * to pick out the required arguments from the route params array.
@@ -127,11 +104,9 @@ class Container implements ArrayAccess {
      * @return array An array of arguments to pass to the controller method.
      */
     public function getMethodArguments(object $object, string $method_name, array $params): array {
-        $reflection = new ReflectionMethod($object, $method_name);
-
         return array_map(
             fn($param) => $this->getParamValue($param, $params),
-            $reflection->getParameters()
+            (new ReflectionMethod($object, $method_name))->getParameters()
         );
     }
 
@@ -143,27 +118,36 @@ class Container implements ArrayAccess {
      * @return mixed The value for the parameter.
      * @throws InvalidArgumentException If the parameter is required but not provided.
      */
-    public function getParamValue(ReflectionParameter $param, array $params) {
+    public function getParamValue(ReflectionParameter $param, array $params = []): mixed {
         $name = $param->getName();
         $type = $param->getType();
 
-        // have a match in the route parameters
-        if (array_key_exists($name, $params)) {
+        if ($params && array_key_exists($name, $params)) {
             return castTo($type, $params[$name]);
+        }
+
+        // 2. Class dependency (autowired from container)
+        if (isSingleType($type) && !$type->isBuiltin()) {
+            try {
+                return $this->get($type->getName());
+            } catch (\InvalidArgumentException $e) {
+                // If the container couldn't resolve it, fall through to default if available!
+                if (!$param->isDefaultValueAvailable() && !$param->allowsNull()) {
+                    throw $e;
+                }
+            }
+        }
 
         // or has a default value for the parameter
-        } elseif ($param->isDefaultValueAvailable()) {
+        if ($param->isDefaultValueAvailable()) {
             return $param->getDefaultValue();
-
-        } elseif (isSingleType($type) && !$type->isBuiltin()) {
-            return $this->get($type->getName());
-
+        }
         // or is nullable
-        } elseif ($param->allowsNull()) {
+        if ($param->allowsNull()) {
             return null;
         }
 
-        throw new InvalidArgumentException("Missing required parameter '{$name}'.");
+        throw new InvalidArgumentException("Unable to resolve parameter '{$name}'.");
     }
 
     // ArrayAccess methods

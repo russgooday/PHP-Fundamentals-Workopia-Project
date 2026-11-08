@@ -20,19 +20,19 @@ class Validator {
 
     private array $messages = [];
 
-    private ValidatorChecks $checks;
+    // private ValidatorChecks $checks;
 
     /**
      * @param array $data The data to validate, keyed by field name.
      * @param array $rules The rules to validate each field against, keyed by field name.
-     * @param array $custom_messages Custom error messages, to add to the default messages.
+     * @param array $custom_messages Custom error messages, to add to the default messages. Optional.
      */
     public function __construct(
-        private readonly array $data,
+        private array $data,
         private array $rules,
+        private ValidatorChecks $checks,
         private array $custom_messages = []
     ) {
-        $this->checks = new ValidatorChecks();
         $this->messages = $this->loadMessages('messages.php', $custom_messages);
     }
 
@@ -85,6 +85,7 @@ class Validator {
         foreach ($this->sortRules($rules) as $rule_string) {
 
             $rule = new Rule($rule_string, $field_name, $field_type, $this->data);
+
             $rule_attribute = $rule->attribute;
 
             if ($rule_attribute === 'sometimes') {
