@@ -11,7 +11,10 @@ readonly class Rule {
         public string $field_type,
         public array $form_data = []
     ) {
-        [$this->attribute, $this->values] = $this->parseRule($rule);
+        [
+            $this->attribute,
+            $this->values
+        ] = $this->parseRule($rule);
     }
 
     private function parseRule(string $rule) {

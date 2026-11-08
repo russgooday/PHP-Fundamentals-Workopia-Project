@@ -3,6 +3,8 @@
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Framework\Validation\Validator;
+use Framework\Validation\ValidatorChecks;
+use Framework\Validation\Model\Validations;
 use Framework\FormRequest;
 
 class TestForm extends FormRequest {
@@ -18,7 +20,9 @@ class ValidatorTest extends TestCase {
     }
 
     private function makeValidator(array $data, array $rules): Validator {
-        return new Validator($data, $rules, self::$messages);
+        $checks = new ValidatorChecks($this->createStub(Validations::class));
+
+        return new Validator($data, $rules, $checks, self::$messages);
     }
 
 
@@ -166,6 +170,7 @@ class ValidatorTest extends TestCase {
         $validator = new Validator(
             ['code' => 'abc1'],
             ['code' => ['pattern:^[a-z]+$']],
+            new ValidatorChecks($this->createStub(Validations::class)),
             ['code.pattern' => fn() => 'Lowercase letters only.']
         );
         $validator->validate();

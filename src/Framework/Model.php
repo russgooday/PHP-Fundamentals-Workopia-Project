@@ -93,7 +93,7 @@ abstract class Model {
      */
     public function create(array $data): bool {
 
-        if (!$data = $this->_getfillables($data)) {
+        if (!$data = $this->getfillables($data)) {
             return false;
         }
 
@@ -127,7 +127,7 @@ abstract class Model {
      */
     public function update(int $id, array $data): bool {
 
-        if (!$data = $this->_getfillables($data)) {
+        if (!$data = $this->getfillables($data)) {
             return false;
         }
 
@@ -177,7 +177,7 @@ abstract class Model {
      * @param array $data The data to filter.
      * @return array|null The filtered data array, or null if no fillable columns are present.
      */
-    private function _getfillables(array $data): ?array {
+    private function getfillables(array $data): ?array {
         if (empty($data) || empty($this->fillable)) {
             return null;
         }

@@ -55,3 +55,19 @@ function stripAndNullify(?string $value): ?string {
     $value = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', '', $value);
     return $value === '' ? null : $value;
 }
+
+
+/**
+ * Sanitize input for SQL queries by escaping backticks and wrapping in backticks.
+ *
+ * @param string $value The input value to sanitize.
+ * @return string The sanitized input.
+ * @throws \InvalidArgumentException If the input value is not a valid SQL identifier.
+ */
+function quoteIdentifier(string $value): string {
+    if (preg_match('#[^\w]#', $value)) {
+        throw new \InvalidArgumentException("Invalid SQL identifier '{$value}'.");
+    }
+
+    return '`' . str_replace('`', '``', $value) . '`';
+}
