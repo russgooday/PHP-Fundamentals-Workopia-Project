@@ -20,14 +20,15 @@ class Session {
     }
 
     public function get(string $key, mixed $default = null): mixed {
-        if (array_key_exists($key, $_SESSION['data'])) {
-            return $_SESSION['data'][$key];
-        }
-        return $default;
+        return $this->has($key) ? $_SESSION['data'][$key] : $default;
     }
 
     public function set(string $key, mixed $value): void {
         $_SESSION['data'][$key] = $value;
+    }
+
+    public function has(string $key): bool {
+        return array_key_exists($key, $_SESSION['data']);
     }
 
     public function remove(string $key): void {

@@ -44,21 +44,29 @@ class UserController extends Controller {
     }
 
 
-
+    /**
+     * Handle the submission of the user registration form.
+     *
+     * @param RegisterRequest $form The form request containing the registration data.
+     * @return Response
+     */
     public function store(RegisterRequest $form) {
+        // pick only these selected fields ('id' will be ignored in post data)
+        $picked_fields = pick('id', 'name', 'email', 'city', 'state');
+
         if ($form->validate()) {
-            $this->users->create($form->sanitized());
+            // Sanitize the form data including password before storing it
+            $user = $picked_fields($this->users->create($form->sanitized()));
 
-            $this->session->success('User successfully registered.');
+            $this->session->regenerateId();
+            $this->session->set('user', $user);
+            $this->session->success('Registration successful. You are now logged in.');
 
-            return $this->redirect('/auth/login');
+            return $this->redirect('/');
         } else {
-            // pick only select fields to repopulate the form with
-            $fields = pick('name', 'email', 'city', 'state');
-
             return $this->create([
                 'errors' => $form->getErrors(),
-                'user' => (object) $fields($this->request->post)
+                'user' => (object) $picked_fields($this->request->post)
             ]);
         }
     }

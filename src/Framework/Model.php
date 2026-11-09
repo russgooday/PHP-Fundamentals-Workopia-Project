@@ -70,10 +70,9 @@ abstract class Model {
      * Fetch a single record from the model's table by its ID.
      *
      * @param int $id The ID of the record to fetch.
-     * @return mixed The record as an associative array, or
-     * null if not found or the query fails.
+     * @return object|false The record as a stdClass object, or false if not found.
      */
-    public function findOne(int $id): mixed {
+    public function findOne(int $id): object|false {
         $sql = 'SELECT * FROM ' . $this->getTable() . ' WHERE id = :id';
 
 
@@ -89,12 +88,15 @@ abstract class Model {
      * Create a new record in the model's table with the provided data.
      *
      * @param array $data The data to insert into the table.
-     * @return bool True if the record was successfully created, false otherwise.
+     * @return object|false The newly created record as a stdClass object.
      */
-    public function create(array $data): bool {
+    public function create(array $data): object|false {
 
         if (!$data = $this->getfillables($data)) {
-            return false;
+            throw new \LogicException(
+                'No fillable columns in data passed to ' . static::class .
+                '::create(). Check $fillable matches the input keys.'
+            );
         }
 
         $cols = array_keys($data);
@@ -114,7 +116,7 @@ abstract class Model {
 
         $stmt->execute();
 
-        return $stmt->rowCount() > 0;
+        return $this->findOne($this->lastId());
     }
 
 
@@ -168,6 +170,16 @@ abstract class Model {
         $stmt->execute();
 
         return $stmt->rowCount() > 0;
+    }
+
+
+    /**
+     * Get the ID of the last inserted record.
+     *
+     * @return int The ID of the last inserted record.
+     */
+    public function lastId(): int {
+        return (int) $this->getConnection()->lastInsertId();
     }
 
 

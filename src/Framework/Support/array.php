@@ -2,20 +2,33 @@
 
 if (!function_exists('pick')) {
     /**
-     * Returns a function that picks specified keys from an array.
+     * Returns a function that picks specified keys from an object or array.
      *
-     * @param string ...$keys The keys to pick from the array.
-     * @return callable A function that takes an array and returns an array with only the specified keys.
+     * @param mixed ...$keys The keys to pick from the object or array.
+     * @return callable A function that takes an object or array and
+     * returns an object with only the specified keys.
      */
     function pick(mixed ...$keys): callable {
 
-        return function(array $arr) use ($keys): array {
-            $picked = [];
+        return function(array|object $src) use ($keys): array|object {
+            if (is_array($src)) {
+                $picked = [];
 
-            foreach ($keys as $key) {
-                if (array_key_exists($key, $arr)) {
-                    $picked[$key] = $arr[$key];
+                foreach ($keys as $key) {
+                    if (array_key_exists($key, $src)) {
+                        $picked[$key] = $src[$key];
+                    }
                 }
+
+            } else {
+                $picked = new stdClass;
+
+                foreach ($keys as $key) {
+                    if (property_exists($src, $key)) {
+                        $picked->$key = $src->$key;
+                    }
+                }
+
             }
 
             return $picked;

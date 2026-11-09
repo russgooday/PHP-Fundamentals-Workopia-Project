@@ -32,17 +32,25 @@ class Validations {
         return $stmt;
     }
 
-
-    public function exists(string $table, string $column, mixed $value) {
+    /**
+     * Checks if a value exists in a specific column of a table.
+     *
+     * @param string $table The name of the table to check.
+     * @param string $column The column to check the value against.
+     * @param mixed $value The value to check for existence.
+     * @return bool True if the value exists, false otherwise.
+     */
+    public function exists(string $table, string $column, mixed $value): bool {
         $sql = "
-            SELECT * FROM " . quoteIdentifier($table) . "
+            SELECT 1 FROM " . quoteIdentifier($table) . "
             WHERE " . quoteIdentifier($column) . " = :value
+            LIMIT 1
         ";
 
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->bindValue(':value', $value, pdoDataType($value));
         $stmt->execute();
 
-        return $stmt->fetch();
+        return (bool) $stmt->fetch();
     }
 }
