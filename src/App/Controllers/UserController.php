@@ -1,10 +1,10 @@
 <?php
 namespace App\Controllers;
 
-use Framework\Exceptions\HttpException,
-    Framework\Controller,
+use Framework\Controller,
     Framework\Response,
-    Framework\Session;
+    Framework\Session,
+    Framework\Authorise\Authorise;
 
 use App\Models\Users,
     App\FormRequests\LoginRequest,
@@ -15,20 +15,21 @@ class UserController extends Controller {
 
     public function __construct(
         private Users $users,
+        private Authorise $auth,
         private Session $session
     ) {}
 
     /**
      * Display the user registration form.
-     * @param array $additionalData Additional data to pass to the view.
+     * @param array $formData Errors and any previous field values.
      *
      * @return Response
      */
-    public function create(array $additionalData = []) {
+    public function create(array $formData = []) {
         $data = [
             'title' => 'Register',
             'scripts' => ['/js/form.js'],
-            ...$additionalData
+            ...$formData
         ];
 
         return $this->view('users/register', $data);
@@ -36,11 +37,14 @@ class UserController extends Controller {
 
     /**
      * Display the user login form.
+     * @param array $formData Errors and any previous field values.
      *
      * @return Response
      */
-    public function login() {
-        return $this->view('users/login', ['title' => 'Login']);
+    public function login(array $formData = []) {
+        $data = ['title' => 'Login', ...$formData];
+
+        return $this->view('users/login', $data);
     }
 
 
@@ -51,23 +55,35 @@ class UserController extends Controller {
      * @return Response
      */
     public function store(RegisterRequest $form) {
-        // pick only these selected fields ('id' will be ignored in post data)
-        $picked_fields = pick('id', 'name', 'email', 'city', 'state');
 
         if ($form->validate()) {
-            // Sanitize the form data including password before storing it
-            $user = $picked_fields($this->users->create($form->sanitized()));
+            $this->users->create($form->sanitized());
+            $this->session->success('Registration successful. Please log in.');
 
-            $this->session->regenerateId();
-            $this->session->set('user', $user);
-            $this->session->success('Registration successful. You are now logged in.');
-
-            return $this->redirect('/');
+            return $this->redirect('/auth/login');
         } else {
+            $picked_fields = pick('name', 'email', 'city', 'state');
+
             return $this->create([
                 'errors' => $form->getErrors(),
                 'user' => (object) $picked_fields($this->request->post)
             ]);
         }
+    }
+
+
+    public function authenticate(LoginRequest $form) {
+
+        if ($form->validate()) {
+            if ($this->auth->attempt($this->users, $form->sanitized())) {
+                $this->session->success('You are successfully logged in.');
+
+                return $this->redirect('/');
+            }
+
+            $errors = ['email' => 'Incorrect email or password!'];
+        }
+
+        return $this->login(['errors' => $errors ?? $form->getErrors()]);
     }
 }

@@ -20,10 +20,14 @@ use Framework\{
 
 use Framework\Container\Container;
 
-use App\Config\{Services, Routes, Middleware};
+use App\Config\{AppServices, Routes, Middleware};
+use Framework\Config\FrameworkServices;
 
 // register the services container
-$container = Services::register(new Container);
+$container = new Container;
+
+FrameworkServices::register($container);
+AppServices::register($container);
 
 // curry the error handler for lazy evaluation
 $error_handler = curryN(2, fn($method, ...$args) =>

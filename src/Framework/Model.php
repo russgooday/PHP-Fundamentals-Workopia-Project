@@ -73,11 +73,32 @@ abstract class Model {
      * @return object|false The record as a stdClass object, or false if not found.
      */
     public function findOne(int $id): object|false {
-        $sql = 'SELECT * FROM ' . $this->getTable() . ' WHERE id = :id';
-
+        $sql = 'SELECT * FROM ' . $this->getTable() . ' WHERE id = :id LIMIT 1';
 
         $stmt = $this->getConnection()->prepare($sql);
         $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetch();
+    }
+
+
+    public function findOneBy(string $column, mixed $value): object|false {
+        $column = quoteIdentifier($column);
+        $equals = is_null($value) ? 'IS NULL' : '= :value';
+
+        $sql = "
+            SELECT * FROM {$this->getTable()}
+            WHERE $column $equals
+            LIMIT 1
+        ";
+
+        $stmt = $this->getConnection()->prepare($sql);
+
+        if (!is_null($value)) {
+            $stmt->bindValue(':value', $value, pdoDataType($value));
+        }
+
         $stmt->execute();
 
         return $stmt->fetch();

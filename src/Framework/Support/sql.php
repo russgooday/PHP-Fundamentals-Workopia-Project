@@ -29,6 +29,26 @@ function sqlUpdateParams(array $keys): string {
     return implode(', ', array_map(fn($key) => "$key=:$key", $keys));
 }
 
+
+/**
+ * Generate an array of named placeholders for use in SQL IN clauses.
+ *
+ * @param string $prefix The prefix for the placeholder names.
+ * @param int $count The number of placeholders to generate.
+ * @return array The array of named placeholders.
+ * @example sqlInParams('id', 3) will return [':id_0', ':id_1', ':id_2']
+ */
+function sqlInParams(string $prefix, int $count): array {
+	$params = [];
+
+    for ($i = 0; $i < $count; $i++) {
+        $params[] = ":{$prefix}_{$i}";
+    }
+
+    return $params;
+}
+
+
 /**
  * Get the PDO data type for a given value.
  *
