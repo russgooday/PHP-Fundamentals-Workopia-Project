@@ -51,7 +51,7 @@ class Dispatcher {
         $middlewares = [];
 
         foreach ($global as $key => $class_name) {
-            if ($middleware = $this->container->get($class_name)) {
+            if ($middleware = $this->container[$class_name]) {
                 $middlewares[$key] = $middleware;
             }
         }
@@ -62,7 +62,7 @@ class Dispatcher {
 
         foreach ($route_classes as $key) {
             if (array_key_exists($key, $aliases)) {
-                $middlewares[$key] = $this->container->get($aliases[$key]);
+                $middlewares[$key] = $this->container[$aliases[$key]];
             }
         }
 

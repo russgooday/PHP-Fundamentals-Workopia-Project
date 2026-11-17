@@ -1,58 +1,9 @@
 <?php
-require_once __DIR__ . '/../src/App/helpers.php';
-require_once __DIR__ . '/../src/Framework/functions.php';
-require_once __DIR__ . '/../autoloader.php';
+// Front controller for the application
 
-$auto_loader = (new Autoloader())
-    ->addNamespace('App\\', 'src/App/')
-    ->addNamespace('Framework\\', 'src/Framework/')
-    ->addNamespace('Symfony\\Component\\VarDumper\\', 'vendor/symfony/var-dumper/')
-    ->loadFile('vendor/symfony/var-dumper/Resources/functions/dump.php')
-    ->register();
+use Framework\Request;
 
-use Framework\{
-    Router,
-    Dispatcher,
-    Request,
-    ErrorHandler,
-    Session
-};
+require_once __DIR__ . '/../bootstrap/app.php';
 
-use Framework\Container\Container;
-
-use App\Config\{AppServices, Routes, Middleware};
-use Framework\Config\FrameworkServices;
-
-// register the services container
-$container = new Container;
-
-FrameworkServices::register($container);
-AppServices::register($container);
-
-// curry the error handler for lazy evaluation
-$error_handler = curryN(2, fn($method, ...$args) =>
-    $container[ErrorHandler::class]->$method(...$args)
-);
-
-// pass in the appropriate methods to the error handler ready for use
-set_exception_handler($error_handler('handleException'));
-set_error_handler($error_handler('handleError'));
-
-// register the routes
-$router = Routes::register(new Router($container));
-
-$middlewares = Middleware::register();
-
-$session = $container->get(Session::class);
-
-$session->start();
-
-$dispatcher = new Dispatcher($router, $container, $middlewares);
-
-try {
-    $response = $dispatcher->dispatch($container[Request::class]);
-} finally {
-    $session->storeNewMessages();
-}
-
+$response = $app->handle(Request::createFromGlobals());
 $response->send();

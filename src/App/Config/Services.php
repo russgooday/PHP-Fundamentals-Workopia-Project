@@ -10,10 +10,11 @@ use Framework\{
 };
 
 use Framework\Container\Container;
+use Framework\Providers\ServiceProvider;
 
-class AppServices {
+class Services extends ServiceProvider {
 
-    public static function register(Container $container): Container {
+    public function register(Container $container): void {
 
         $db_config = parse_ini_file(Paths::ROOT . '/.env');
 
@@ -22,6 +23,7 @@ class AppServices {
             ->singleton(ViewerInterface::class, fn() => new PHPViewer());
 
         $container
+            // Set viewer on the base controller
             ->afterResolving(
                 Controller::class,
 
@@ -31,6 +33,7 @@ class AppServices {
                     }
                 }
             )
+            // share the session globally in view
             ->afterResolving(
                 ViewerInterface::class,
 
@@ -38,7 +41,5 @@ class AppServices {
                     $viewer->share('session', $container[Session::class]);
                 }
             );
-
-        return $container;
     }
 }

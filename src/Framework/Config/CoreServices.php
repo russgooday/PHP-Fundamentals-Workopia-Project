@@ -4,13 +4,15 @@ namespace Framework\Config;
 
 use Framework\Container\Container;
 use Framework\{Request, Session, Response};
+use Framework\Providers\ServiceProvider;
 
-class FrameworkServices {
-    public static function register(Container $container): Container {
+class CoreServices extends ServiceProvider {
+    public function register(Container $container): void {
+
         $container->singleton(Request::class, fn() => Request::createFromGlobals());
-        $container->singleton(Session::class, fn() => new Session);
-        $container->bind(Response::class, fn() => new Response);
 
-        return $container;
+        $container->singleton(Session::class, fn() => new Session);
+
+        $container->bind(Response::class, fn() => new Response);
     }
 }

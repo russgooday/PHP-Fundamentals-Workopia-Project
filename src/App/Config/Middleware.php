@@ -2,17 +2,16 @@
 
 namespace App\Config;
 
-class Middleware {
-    public static function register(): array {
-        return [
-            // Global middlewares executed on every single request
-            'global' => [
-                \App\Middleware\CrossSite::class,
-                \App\Middleware\TrimNullify::class
-            ],
+use Framework\Providers\MiddlewareProvider;
 
-            // Route aliases for specific route endpoints
-            'aliases' => []
-        ];
-    }
+class Middleware extends MiddlewareProvider {
+
+    protected array $global = [
+        \App\Middleware\CrossSite::class,
+        \App\Middleware\TrimNullify::class
+    ];
+
+    protected array $aliases = [
+        // 'auth' => \App\Middleware\Authenticate::class
+    ];
 }

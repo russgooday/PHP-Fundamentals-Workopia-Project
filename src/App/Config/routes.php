@@ -1,9 +1,10 @@
 <?php
 namespace App\Config;
 use Framework\Router;
+use Framework\Providers\RoutesProvider;
 
-class Routes {
-    public static function register(Router $router): Router {
+class Routes extends RoutesProvider {
+    public function register(Router $router): Router {
 
         $router->get('/', 'HomeController')->middleware(['example']);
         $router->get('/listings', 'ListingsController');
