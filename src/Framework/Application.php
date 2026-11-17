@@ -8,16 +8,16 @@ use Framework\Providers\{RoutesProvider, ServiceProvider, MiddlewareProvider};
 
 class Application {
 
+    protected Dispatcher $dispatcher;
+
     protected array $middleware = ['global' => [], 'aliases' => []];
 
     protected array $services = [];
-
 
     private function __construct(
         protected Router $router,
         protected Container $container
     ) {}
-
 
     /**
      * Initializes the application instance with core services and middleware.
@@ -60,9 +60,7 @@ class Application {
             $service->register($container);
         }
 
-        $dispatcher = new Dispatcher($this->router, $container, $this->middleware);
-
-        $container->bind(Dispatcher::class, fn() => $dispatcher);
+        $this->dispatcher = new Dispatcher($this->router, $container, $this->middleware);
 
         return $this;
     }
@@ -78,7 +76,7 @@ class Application {
 
         $this->container->singleton(Request::class, fn() => $request);
 
-        return $this->container[Dispatcher::class]->dispatch($request);
+        return $this->dispatcher->dispatch($request);
     }
 
 
